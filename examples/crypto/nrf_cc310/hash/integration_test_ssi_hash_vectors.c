@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016 - 2017, Nordic Semiconductor ASA
+ * Copyright (c) 2017 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -100,7 +100,7 @@ const hashDataStuct hashVectors[] = {
          0x2B2D0FC8,0xBA7A09A6,0x105D2E0D,0xDEA30C98},
 		/*SHA512 expected dataSize*/
 		CRYS_HASH_SHA512_DIGEST_SIZE_IN_BYTES*sizeof(uint8_t),
-	}
+	},
 };
 
 
