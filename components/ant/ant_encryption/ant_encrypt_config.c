@@ -10,13 +10,15 @@
  *
  */
 
+#include "sdk_config.h"
+#if ANT_ENCRYPT_CONFIG_ENABLED
 #include <stdlib.h>
 #include "ant_encrypt_config.h"
 #include "ant_interface.h"
 #include "ant_parameters.h"
 #include "sdk_common.h"
 
-#ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+#ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
     #include "ant_encrypt_negotiation_slave.h"
 #endif
 
@@ -66,7 +68,7 @@ ret_code_t ant_stack_encryption_config(ant_encrypt_stack_settings_t const * cons
         }
     }
 
-    #ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+    #ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
         // all ANT channels have unsupported slave encryption tracking (even master's channel)
         ant_channel_encryp_negotiation_slave_init();
     #endif
@@ -128,13 +130,13 @@ ret_code_t ant_channel_encrypt_config(uint8_t                          channel_t
         {
             case CHANNEL_TYPE_MASTER:
                 err_code = ant_channel_encrypt_config_perform(channel_number, p_crypto_config);
-#ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+#ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
                 ant_channel_encryp_tracking_state_set(channel_number,
                                                       ANT_ENC_CHANNEL_STAT_TRACKING_UNSUPPORTED);
 #endif
                 break;
 
-#ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+#ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
             case CHANNEL_TYPE_SLAVE:
                 ant_slave_channel_encrypt_config(channel_number, p_crypto_config);
 
@@ -160,7 +162,7 @@ ret_code_t ant_channel_encrypt_config(uint8_t                          channel_t
     }
     else
     {
-#ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+#ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
         ant_channel_encryp_tracking_state_set(channel_number,
                                               ANT_ENC_CHANNEL_STAT_TRACKING_UNSUPPORTED);
 #endif
@@ -183,7 +185,7 @@ void ant_encrypt_event_handler(ant_evt_t * p_ant_evt)
 {
     uint8_t const ant_channel = p_ant_evt->channel;
 
-#ifdef ANT_ENCRYPT_SLAVE_NEGOTIATION_USED
+#ifdef ANT_ENCRYPT_NEGOTIATION_SLAVE_ENABLED
     ant_slave_encrypt_negotiation(p_ant_evt);
 #endif
 
@@ -208,3 +210,4 @@ void ant_enc_event_handler_register(ant_encryp_user_handler_t user_handler_func)
     m_ant_enc_evt_handler = user_handler_func;
 }
 
+#endif // ANT_ENCRYPT_CONFIG_ENABLED

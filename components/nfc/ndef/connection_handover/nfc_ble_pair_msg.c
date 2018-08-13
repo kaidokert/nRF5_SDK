@@ -51,7 +51,7 @@ static ret_code_t nfc_ble_simplified_le_oob_msg_declare( ble_advdata_t       con
     /* you must clear the message (needed for supporting multiple calls) */
     nfc_ndef_msg_clear(&NFC_NDEF_MSG(nfc_le_oob_msg));
 
-    if(p_le_advdata != NULL)
+    if (p_le_advdata != NULL)
     {
         /* Create NFC NDEF LE OOB Record description without record ID field */
         p_nfc_le_oob_record = nfc_le_oob_rec_declare(0 , p_le_advdata);
@@ -100,7 +100,7 @@ static ret_code_t nfc_ble_simplified_ep_oob_msg_declare( ble_advdata_t       con
     /* you must clear the message (needed for supporting multiple calls) */
     nfc_ndef_msg_clear(&NFC_NDEF_MSG(nfc_ep_oob_msg));
 
-    if(p_ep_advdata != NULL)
+    if (p_ep_advdata != NULL)
     {
         /* Create NFC NDEF EP OOB Record description without record ID field */
         p_nfc_ep_oob_record = nfc_ep_oob_rec_declare(0 , p_ep_advdata);
@@ -163,13 +163,13 @@ static ret_code_t nfc_ble_full_handover_select_msg_declare( ble_advdata_t    con
     nfc_hs_rec_local_record_clear(p_nfc_hs_record);
 
     err_code = nfc_hs_rec_local_record_add(p_nfc_hs_record, &NFC_NDEF_AC_RECORD_DESC(ac_rec_le));
-    if(err_code != NRF_SUCCESS)
+    if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
 
     err_code = nfc_hs_rec_local_record_add(p_nfc_hs_record, &NFC_NDEF_AC_RECORD_DESC(ac_rec_ep));
-    if(err_code != NRF_SUCCESS)
+    if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
@@ -188,19 +188,19 @@ static ret_code_t nfc_ble_full_handover_select_msg_declare( ble_advdata_t    con
     nfc_ndef_msg_clear(&NFC_NDEF_MSG(hs_full_msg));
 
     err_code = nfc_ndef_msg_record_add(&NFC_NDEF_MSG(hs_full_msg), p_nfc_hs_record);
-    if(err_code != NRF_SUCCESS)
+    if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
 
     err_code = nfc_ndef_msg_record_add(&NFC_NDEF_MSG(hs_full_msg), p_nfc_le_oob_record);
-    if(err_code != NRF_SUCCESS)
+    if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
 
     err_code = nfc_ndef_msg_record_add(&NFC_NDEF_MSG(hs_full_msg), p_nfc_ep_oob_record);
-    if(err_code != NRF_SUCCESS)
+    if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
@@ -229,7 +229,7 @@ static void common_adv_data_create( ble_advdata_tk_value_t * const p_tk_value,
     p_adv_data->include_appearance = true;
     p_adv_data->name_type          = BLE_ADVDATA_FULL_NAME;
     p_adv_data->p_tk_value         = NULL;
-    if(p_tk_value != NULL)
+    if (p_tk_value != NULL)
     {
         p_adv_data->p_tk_value = p_tk_value;
     }
@@ -355,7 +355,7 @@ ret_code_t nfc_ble_pair_default_msg_encode( nfc_ble_pair_type_t            nfc_b
     ble_advdata_t ep_adv_data;
     ret_code_t    err_code = NRF_SUCCESS;
 
-    switch(nfc_ble_pair_type)
+    switch (nfc_ble_pair_type)
     {
 
         case NFC_BLE_PAIR_MSG_BLUETOOTH_LE_SHORT:

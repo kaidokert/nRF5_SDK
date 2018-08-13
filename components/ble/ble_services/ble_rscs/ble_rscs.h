@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_rsc Running Speed and Cadence Service
+ * @defgroup ble_rscs Running Speed and Cadence Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Running Speed and Cadence Service module.
@@ -39,6 +39,10 @@
 #include <stdbool.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Running Speed and Cadence Service feature bits. */
 #define BLE_RSCS_FEATURE_INSTANT_STRIDE_LEN_BIT             (0x01 << 0)     /**< Instantaneous Stride Length Measurement Supported bit. */
@@ -138,6 +142,11 @@ void ble_rscs_on_ble_evt(ble_rscs_t * p_rscs, ble_evt_t * p_ble_evt);
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_rscs_measurement_send(ble_rscs_t * p_rscs, ble_rscs_meas_t * p_measurement);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_RSCS_H__
 

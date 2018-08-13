@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_hrs Heart Rate Service
+ * @defgroup ble_hrs Heart Rate Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Heart Rate Service module.
@@ -48,6 +48,10 @@
 #include <stdbool.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Body Sensor Location values
 #define BLE_HRS_BODY_SENSOR_LOCATION_OTHER      0
@@ -186,6 +190,11 @@ void ble_hrs_sensor_contact_detected_update(ble_hrs_t * p_hrs, bool is_sensor_co
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_hrs_body_sensor_location_set(ble_hrs_t * p_hrs, uint8_t body_sensor_location);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_HRS_H__
 

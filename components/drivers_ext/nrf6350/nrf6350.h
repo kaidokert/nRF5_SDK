@@ -16,6 +16,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LCD_LLEN 16                //!< LCD Line length
 
 #define JS_BUTTON_NONE      0x00   //!< Joystick not touched
@@ -113,6 +117,11 @@ bool nrf6350_js_get_status(uint8_t *js_state);
 /** @brief  Function for transferring data over TWI bus. Used the first time you want to communicate nRF6350 to bypass a fail.
  */
 bool nrf6350_lcd_wake_up(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // NRF6350_H_
 /** @} */

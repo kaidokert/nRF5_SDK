@@ -18,7 +18,11 @@
 
 #include "nrf_rng.h"
 #include "sdk_errors.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @addtogroup nrf_rng RNG HAL and driver
@@ -112,4 +116,9 @@ ret_code_t nrf_drv_rng_block_rand(uint8_t * p_buff, uint32_t length);
 /**
  *@}
  **/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NRF_DRV_RNG_H__

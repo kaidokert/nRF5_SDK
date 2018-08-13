@@ -25,6 +25,10 @@
 
 #include "nfc_ndef_record.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @enum nfc_uri_id_t
  * @brief URI identifier codes according to "URI Record Type Definition"
@@ -93,4 +97,9 @@ nfc_ndef_record_desc_t * nfc_uri_rec_declare( nfc_uri_id_t           uri_id_code
                                               uint8_t const *  const p_uri_data,
                                               uint8_t                uri_data_len);
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_URI_REC_H__

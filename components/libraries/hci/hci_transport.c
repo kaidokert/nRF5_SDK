@@ -9,13 +9,12 @@
  * the file.
  *
  */
-
-#include "hci_transport_config.h"
+#include "sdk_config.h"
+#if HCI_TRANSPORT_ENABLED
 #include "hci_transport.h"
 #include "hci_slip.h"
 #include "crc16.h"
 #include "hci_mem_pool.h"
-#include "hci_mem_pool_internal.h"
 #include "app_timer.h"
 #include "app_error.h"
 #include <stdio.h>
@@ -30,7 +29,10 @@
 #define INITIAL_ACK_NUMBER_EXPECTED     1u                                                                 /**< Initial acknowledge number expected. */
 #define INITIAL_ACK_NUMBER_TX           INITIAL_ACK_NUMBER_EXPECTED                                        /**< Initial acknowledge number transmitted. */
 #define INVALID_PKT_TYPE                0xFFFFFFFFu                                                        /**< Internal invalid packet type value. */
-#define MAX_TRANSMISSION_TIME           (ROUNDED_DIV((MAX_PACKET_SIZE_IN_BITS * 1000u), USED_BAUD_RATE))   /**< Max transmission time of a single application packet over UART in units of mseconds. */
+#define HCI_UART_REG_VALUE_TO_BAUDRATE(BAUDRATE) ((BAUDRATE)/268)                                          /**< Estimated relation between UART baudrate register value and actual baudrate */
+#define MAX_TRANSMISSION_TIME                                                  \
+                   (ROUNDED_DIV((HCI_MAX_PACKET_SIZE_IN_BITS * 1000u),         \
+                    HCI_UART_REG_VALUE_TO_BAUDRATE(HCI_UART_BAUDRATE)))                                    /**< Max transmission time of a single application packet over UART in units of mseconds. */
 #define RETRANSMISSION_TIMEOUT_IN_MS    (3u * MAX_TRANSMISSION_TIME)                                       /**< Retransmission timeout for application packet in units of mseconds. */
 #define APP_TIMER_PRESCALER             0                                                                  /**< Value of the RTC1 PRESCALER register. */
 #define RETRANSMISSION_TIMEOUT_IN_TICKS APP_TIMER_TICKS(RETRANSMISSION_TIMEOUT_IN_MS, APP_TIMER_PRESCALER) /**< Retransmission timeout for application packet in units of timer ticks. */
@@ -255,14 +257,14 @@ static void rx_vendor_specific_pkt_type_handle(const uint8_t * p_buffer, uint32_
             err_code = hci_mem_pool_rx_data_size_set(length);
             APP_ERROR_CHECK(err_code);
 
-            err_code = hci_mem_pool_rx_produce(RX_BUF_SIZE, (void **)&mp_slip_used_rx_buffer);
+            err_code = hci_mem_pool_rx_produce(HCI_RX_BUF_SIZE, (void **)&mp_slip_used_rx_buffer);
             APP_ERROR_CHECK_BOOL((err_code == NRF_SUCCESS) || (err_code == NRF_ERROR_NO_MEM));
 
             // If memory pool RX buffer produce succeeded we register that buffer to slip layer
             // otherwise we register the internal acknowledgement buffer.
             err_code = hci_slip_rx_buffer_register(
                 (err_code == NRF_SUCCESS) ? mp_slip_used_rx_buffer : m_rx_ack_buffer,
-                (err_code == NRF_SUCCESS) ? RX_BUF_SIZE : ACK_BUF_SIZE);
+                (err_code == NRF_SUCCESS) ? HCI_RX_BUF_SIZE : ACK_BUF_SIZE);
 
             APP_ERROR_CHECK(err_code);
 
@@ -277,7 +279,7 @@ static void rx_vendor_specific_pkt_type_handle(const uint8_t * p_buffer, uint32_
         {
             // RX packet discarded: sequence number not valid, set the same buffer to slip layer in
             // order to avoid buffer overrun.
-            err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, RX_BUF_SIZE);
+            err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, HCI_RX_BUF_SIZE);
             APP_ERROR_CHECK(err_code);
 
             // As packet did not have expected sequence number: send acknowledgement with the
@@ -289,7 +291,7 @@ static void rx_vendor_specific_pkt_type_handle(const uint8_t * p_buffer, uint32_
     {
         // RX packet discarded: reset the same buffer to slip layer in order to avoid buffer
         // overrun.
-        err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, RX_BUF_SIZE);
+        err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, HCI_RX_BUF_SIZE);
         APP_ERROR_CHECK(err_code);
     }
 }
@@ -502,19 +504,19 @@ void slip_event_handle(hci_slip_evt_t event)
                     // producing fails use the internal acknowledgement buffer.
                     if (mp_slip_used_rx_buffer != NULL)
                     {
-                        err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, RX_BUF_SIZE);
+                        err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, HCI_RX_BUF_SIZE);
                         APP_ERROR_CHECK(err_code);
                     }
                     else
                     {
-                        err_code = hci_mem_pool_rx_produce(RX_BUF_SIZE,
+                        err_code = hci_mem_pool_rx_produce(HCI_RX_BUF_SIZE,
                                                            (void **)&mp_slip_used_rx_buffer);
                         APP_ERROR_CHECK_BOOL((err_code == NRF_SUCCESS) ||
                                             (err_code == NRF_ERROR_NO_MEM));
 
                         err_code = hci_slip_rx_buffer_register(
                             (err_code == NRF_SUCCESS) ? mp_slip_used_rx_buffer : m_rx_ack_buffer,
-                            (err_code == NRF_SUCCESS) ? RX_BUF_SIZE : ACK_BUF_SIZE);
+                            (err_code == NRF_SUCCESS) ? HCI_RX_BUF_SIZE : ACK_BUF_SIZE);
                         APP_ERROR_CHECK(err_code);
                     }
                     break;
@@ -603,14 +605,14 @@ uint32_t hci_transport_open(void)
     err_code = hci_slip_open();
     VERIFY_SUCCESS(err_code);
 
-    err_code = hci_mem_pool_rx_produce(RX_BUF_SIZE, (void **)&mp_slip_used_rx_buffer);
+    err_code = hci_mem_pool_rx_produce(HCI_RX_BUF_SIZE, (void **)&mp_slip_used_rx_buffer);
     if (err_code != NRF_SUCCESS)
     {
         // @note: conduct required interface adjustment.
         return NRF_ERROR_INTERNAL;
     }
 
-    err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, RX_BUF_SIZE);
+    err_code = hci_slip_rx_buffer_register(mp_slip_used_rx_buffer, HCI_RX_BUF_SIZE);
 
     return err_code;
 }
@@ -777,3 +779,4 @@ uint32_t hci_transport_rx_pkt_consume(uint8_t * p_buffer)
 {
     return (hci_mem_pool_rx_consume(p_buffer - PKT_HDR_SIZE));
 }
+#endif //HCI_TRANSPORT_ENABLED

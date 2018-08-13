@@ -30,6 +30,10 @@
 #include <stdint.h>
 #include "ble_gls.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BLE_GLS_DB_MAX_RECORDS      20
 
 /**@brief Function for initializing the glucose record database.
@@ -78,6 +82,11 @@ uint32_t ble_gls_db_record_add(ble_gls_rec_t * p_rec);
  * @return      NRF_SUCCESS on success.
  */
 uint32_t ble_gls_db_record_delete(uint8_t record_num);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_GLS_DB_H__
 

@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_hids Human Interface Device Service
+ * @defgroup ble_hids Human Interface Device Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Human Interface Device Service module.
@@ -43,6 +43,10 @@
 #include <stdbool.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @name Report Type values
  * @anchor BLE_HIDS_REPORT_TYPE @{
@@ -308,6 +312,11 @@ uint32_t ble_hids_outp_rep_get(ble_hids_t * p_hids,
                                uint16_t     len,
                                uint8_t      offset,
                                uint8_t *    p_outp_rep);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_HIDS_H__
 

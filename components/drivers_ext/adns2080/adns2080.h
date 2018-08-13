@@ -18,12 +18,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file
 * @brief ADNS2080 mouse sensor driver
 *
 * @defgroup nrf_drivers_adns2080 ADNS2080 driver
 * @{
-* @ingroup nrf_drivers
+* @ingroup ext_drivers
 * @brief ADNS2080 mouse sensor driver.
 */
 
@@ -278,4 +282,9 @@ adns2080_mode_t adns2080_force_mode_read(void);
  **/
 
 /*lint --flb "Leave library region" */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

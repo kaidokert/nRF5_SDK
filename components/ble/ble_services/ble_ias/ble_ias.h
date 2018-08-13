@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_ias Immediate Alert Service
+ * @defgroup ble_ias Immediate Alert Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Immediate Alert Service module.
@@ -41,6 +41,10 @@
 
 #include <stdint.h>
 #include "ble.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Immediate Alert Service event type. */
 typedef enum
@@ -107,6 +111,11 @@ void ble_ias_on_ble_evt(ble_ias_t * p_ias, ble_evt_t * p_ble_evt);
  * @param[out]  p_alert_level  Current Alert Level value.
  */
 uint32_t ble_ias_alert_level_get(ble_ias_t * p_ias, uint8_t * p_alert_level);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_IAS_H__
 

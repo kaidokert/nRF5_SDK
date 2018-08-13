@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup crc_compute CRC compute
+ * @defgroup crc32 CRC32 compute
  * @{
  * @ingroup hci_transport
  *
@@ -23,6 +23,10 @@
 #define CRC32_H__
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Function for calculating CRC-32 in blocks.
  *
@@ -37,6 +41,11 @@
  * @return The updated CRC-32 value, based on the input supplied.
  */
 uint32_t crc32_compute(uint8_t const * p_data, uint32_t size, uint32_t const * p_crc);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CRC32_H__
 

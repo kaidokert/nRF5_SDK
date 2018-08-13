@@ -15,7 +15,6 @@
 #include "bsp.h"
 #include "ant_stack_handler_types.h"
 #include "ant_parameters.h"
-#include "app_trace.h"
 
 #define BTN_ID_WAKEUP             3  /**< ID of button used to wake up the application. */
 #define BTN_ID_SLEEP              3  /**< ID of button used to put the application into sleep mode. */
@@ -34,7 +33,7 @@ do                                                                              
         return err_code;                                                        \
     }                                                                           \
 }                                                                               \
-while(0)
+while (0)
 
 
 /**@brief This macro will return from the current function if err_code
@@ -48,7 +47,7 @@ do                                                                              
         return err_code;                                                        \
     }                                                                           \
 }                                                                               \
-while(0)
+while (0)
 
 
 static bool m_connected = false;  /**< Notify if channel is connected. */

@@ -3,7 +3,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the license.txt file.
  */
-
+#include "sdk_config.h"
+#if BLE_LBS_ENABLED
 #include "ble_lbs.h"
 #include "ble_srv_common.h"
 #include "sdk_common.h"
@@ -226,3 +227,4 @@ uint32_t ble_lbs_on_button_change(ble_lbs_t * p_lbs, uint8_t button_state)
 
     return sd_ble_gatts_hvx(p_lbs->conn_handle, &params);
 }
+#endif //BLE_LBS_ENABLED

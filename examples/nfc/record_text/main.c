@@ -16,25 +16,29 @@
 #include "nfc_text_rec.h"
 #include "boards.h"
 #include "app_error.h"
-#include "nfc_fixes.h"
+#include "hardfault.h"
+
+#define NRF_LOG_MODULE_NAME "APP"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
 #define MAX_REC_COUNT      3     /**< Maximum records count. */
 
-uint8_t ndef_msg_buf[256];
+uint8_t m_ndef_msg_buf[256];
 
 /**
  * @brief Callback function for handling NFC events.
  */
-void nfc_callback(void * context, NfcEvent event, const char * p_data, size_t data_length)
+static void nfc_callback(void * p_context, nfc_t2t_event_t event, const uint8_t * p_data, size_t data_length)
 {
-    (void)context;
+    (void)p_context;
 
     switch (event)
     {
-        case NFC_EVENT_FIELD_ON:
+        case NFC_T2T_EVENT_FIELD_ON:
             LEDS_ON(BSP_LED_0_MASK);
             break;
-        case NFC_EVENT_FIELD_OFF:
+        case NFC_T2T_EVENT_FIELD_OFF:
             LEDS_OFF(BSP_LED_0_MASK);
             break;
         default:
@@ -140,11 +144,10 @@ static void welcome_msg_encode(uint8_t * p_buffer, uint32_t * p_len)
  */
 int main(void)
 {
-    NfcRetval ret_val;
-    uint32_t  len = sizeof(ndef_msg_buf);
+    uint32_t  len = sizeof(m_ndef_msg_buf);
     uint32_t  err_code;
 
-    err_code = NRF_LOG_INIT();
+    err_code = NRF_LOG_INIT(NULL);
     APP_ERROR_CHECK(err_code);
 
     /* Configure LED-pins as outputs */
@@ -152,26 +155,23 @@ int main(void)
     LEDS_OFF(BSP_LED_0_MASK);
 
     /* Set up NFC */
-    ret_val = nfcSetup(nfc_callback, NULL);
-    APP_ERROR_CHECK(ret_val);
+    err_code = nfc_t2t_setup(nfc_callback, NULL);
+    APP_ERROR_CHECK(err_code);
 
     /* Encode welcome message */
-    welcome_msg_encode(ndef_msg_buf, &len);
+    welcome_msg_encode(m_ndef_msg_buf, &len);
 
     /* Set created message as the NFC payload */
-    ret_val = nfcSetPayload( (char*)ndef_msg_buf, len);
-    APP_ERROR_CHECK(ret_val);
+    err_code = nfc_t2t_payload_set(m_ndef_msg_buf, len);
+    APP_ERROR_CHECK(err_code);
 
     /* Start sensing NFC field */
-    ret_val = nfcStartEmulation();
-    APP_ERROR_CHECK(ret_val);
+    err_code = nfc_t2t_emulation_start();
+    APP_ERROR_CHECK(err_code);
 
-    while(1)
+    while (1)
     {
-        if (!NFC_NEED_MCU_RUN_STATE())
-        {
-            __WFE();
-        }
+        __WFE();
     }
 }
 

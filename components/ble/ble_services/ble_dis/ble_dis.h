@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_dis Device Information Service
+ * @defgroup ble_dis Device Information Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Device Information Service module.
@@ -31,6 +31,10 @@
 
 #include <stdint.h>
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @defgroup DIS_VENDOR_ID_SRC_VALUES Vendor ID Source values
  * @{
@@ -92,6 +96,11 @@ typedef struct
  * @return      NRF_SUCCESS on successful initialization of service.
  */
 uint32_t ble_dis_init(const ble_dis_init_t * p_dis_init);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_DIS_H__
 

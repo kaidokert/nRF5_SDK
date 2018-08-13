@@ -111,7 +111,7 @@ static void generate_modulated_rf_packet(void)
     // Fill payload with random data.
     for (i = 0; i < 254; i++)
     {
-        packet[i+1] = rnd8();
+        packet[i + 1] = rnd8();
     }
     NRF_RADIO->PACKETPTR = (uint32_t)packet;
 }

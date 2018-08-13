@@ -9,7 +9,7 @@
 
 /**@file
  *
- * @defgroup ble_sdk_srv_hrs_c   Heart Rate Service Client
+ * @defgroup ble_hrs_c Heart Rate Service Client
  * @{
  * @ingroup  ble_sdk_srv
  * @brief    Heart Rate Service Client module.
@@ -37,6 +37,10 @@
 #include <stdint.h>
 #include "ble.h"
 #include "ble_db_discovery.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @defgroup hrs_c_enums Enumerations
@@ -209,6 +213,11 @@ uint32_t ble_hrs_c_handles_assign(ble_hrs_c_t *    p_ble_hrs_c,
                                   const hrs_db_t * p_peer_hrs_handles);
 
 /** @} */ // End tag for Function group.
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_HRS_C_H__
 

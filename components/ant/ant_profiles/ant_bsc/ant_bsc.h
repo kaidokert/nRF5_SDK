@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ant_sdk_profiles_bsc Bicycle Speed and Cadence profile
+ * @defgroup ant_bsc Bicycle Speed and Cadence profile
  * @{
  * @ingroup ant_sdk_profiles
  * @brief This module implements the Bicycle Speed and Cadence profile.
@@ -201,6 +201,10 @@ typedef void (* ant_bsc_evt_handler_t) (ant_bsc_profile_t *, ant_bsc_evt_t);
 
 #include "ant_bsc_local.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief BSC Display configuration structure. */
 typedef struct
 {
@@ -319,6 +323,11 @@ void ant_bsc_sens_evt_handler(ant_bsc_profile_t * p_profile,
  */
 void ant_bsc_disp_evt_handler(ant_bsc_profile_t * p_profile,
                               ant_evt_t * p_ant_event);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ANT_BSC_H__
 /** @} */

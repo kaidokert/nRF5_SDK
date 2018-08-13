@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_bas Battery Service
+ * @defgroup ble_bas Battery Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Battery Service module.
@@ -43,6 +43,10 @@
 #include <stdbool.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Battery Service event type. */
 typedef enum
@@ -127,6 +131,11 @@ void ble_bas_on_ble_evt(ble_bas_t * p_bas, ble_evt_t * p_ble_evt);
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_bas_battery_level_update(ble_bas_t * p_bas, uint8_t battery_level);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_BAS_H__
 

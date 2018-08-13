@@ -74,7 +74,7 @@ static bool twi_master_write(uint8_t * data, uint8_t data_length, bool issue_sto
         NRF_TWI1->EVENTS_STOPPED = 0;
         NRF_TWI1->TASKS_STOP     = 1;
         /* Wait until stop sequence is sent */
-        while(NRF_TWI1->EVENTS_STOPPED == 0)
+        while (NRF_TWI1->EVENTS_STOPPED == 0)
         {
             // Do nothing.
         }
@@ -155,7 +155,7 @@ static bool twi_master_read(uint8_t * data, uint8_t data_length, bool issue_stop
     /** @snippet [TWI HW master read] */
 
     /* Wait until stop sequence is sent */
-    while(NRF_TWI1->EVENTS_STOPPED == 0)
+    while (NRF_TWI1->EVENTS_STOPPED == 0)
     {
         // Do nothing.
     }

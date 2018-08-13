@@ -33,6 +33,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief Event types from the SLIP Layer. */
 typedef enum
 {
@@ -123,6 +127,11 @@ uint32_t hci_slip_write(const uint8_t * p_buffer, uint32_t length);
  * @retval NRF_SUCCESS              Operation success.
  */
 uint32_t hci_slip_rx_buffer_register(uint8_t * p_buffer, uint32_t length);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HCI_SLIP_H__
 

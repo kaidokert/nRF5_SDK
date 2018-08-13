@@ -10,9 +10,13 @@
  *
  */
 
+#include "sdk_config.h"
+#if ANT_SDM_ENABLED
+
 #include "ant_sdm_simulator.h"
 #include "ant_sdm_utils.h"
 #include "nordic_common.h"
+#include "app_util.h"
 
 #define SIMULATOR_STRIDE_LENGTH_UNIT_REVERSAL 100                 ///< Stride length unit is cm.
 #define SIMULATOR_BURN_RATE_UNIT              1000                ///< Burn rate uinit is kcal per km.
@@ -127,4 +131,4 @@ void ant_sdm_simulator_decrement(ant_sdm_simulator_t * p_simulator)
     }
 }
 
-
+#endif // ANT_SDM_ENABLED

@@ -19,6 +19,10 @@
 #include "peer_manager_internal.h"
 #include "fds.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /**
  * @cond NO_DOXYGEN
@@ -53,5 +57,10 @@ ret_code_t peer_data_deserialize(pm_peer_data_flash_t const * p_in_data, pm_peer
 /** @}
  * @endcond
  */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PEER_DATA_H__ */

@@ -31,7 +31,8 @@ typedef struct
  * compatible with @ref p_payload_constructor_t.
  *
  * @param[in] p_input           Pointer to the description of the payload.
- * @param[out] p_buff           Pointer to payload destination.
+ * @param[out] p_buff           Pointer to payload destination. If NULL, function will
+ *                              calculate the expected size of the URI record payload.
  *
  * @param[in,out] p_len         Size of available memory to write as input. Size of generated
  *                              payload as output.
@@ -43,16 +44,20 @@ static ret_code_t nfc_uri_payload_constructor( uri_payload_desc_t * p_input,
                                                uint8_t * p_buff,
                                                uint32_t * p_len)
 {
-    /* Verify if there is enough available memory */
-    if(p_input->uri_data_len >= *p_len)
+    if (p_buff != NULL)
     {
-        return NRF_ERROR_NO_MEM;
+        /* Verify if there is enough available memory */
+        if (p_input->uri_data_len >= *p_len)
+        {
+            return NRF_ERROR_NO_MEM;
+        }
+
+        /* Copy descriptor content into the buffer */
+        *(p_buff++) = p_input->uri_id_code;
+        memcpy(p_buff, p_input->p_uri_data, p_input->uri_data_len );
     }
 
-    /* Copy descriptor content into the buffer */
     *p_len      = p_input->uri_data_len + 1;
-    *(p_buff++) = p_input->uri_id_code;
-    memcpy(p_buff, p_input->p_uri_data, p_input->uri_data_len );
 
     return NRF_SUCCESS;
 }

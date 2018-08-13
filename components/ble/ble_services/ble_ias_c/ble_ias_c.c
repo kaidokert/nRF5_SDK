@@ -9,7 +9,8 @@
  * the file.
  *
  */
-
+#include "sdk_config.h"
+#if BLE_IAS_C_ENABLED
 #include "ble_ias_c.h"
 
 #include <string.h>
@@ -44,10 +45,10 @@ void ble_ias_c_on_db_disc_evt(ble_ias_c_t * p_ias_c, const ble_db_discovery_evt_
         {
             // The Alert Level characteristic in the Immediate Alert Service instance is found
             // on peer. Check if it has the correct property 'Write without response'.
-            switch(p_chars[i].characteristic.uuid.uuid)
+            switch (p_chars[i].characteristic.uuid.uuid)
             {
                 case BLE_UUID_ALERT_LEVEL_CHAR:
-                    if(p_chars[i].characteristic.char_props.write_wo_resp)
+                    if (p_chars[i].characteristic.char_props.write_wo_resp)
                     {
                         // Found Alert Level characteristic inside the Immediate Alert Service.
                         memcpy(&evt.alert_level,
@@ -187,3 +188,4 @@ uint32_t ble_ias_c_handles_assign(ble_ias_c_t  * p_ias_c,
     p_ias_c->alert_level_char.handle_value = alert_level_handle;
     return NRF_SUCCESS;
 }
+#endif //BLE_IAS_C_ENABLED

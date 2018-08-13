@@ -14,7 +14,7 @@
 #define FDS_H__
 
 /**
- * @defgroup flash_data_storage Flash Data Storage
+ * @defgroup fds Flash Data Storage
  * @ingroup app_common
  * @{
  *
@@ -29,6 +29,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "sdk_errors.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**@brief   Invalid file ID.
@@ -729,5 +733,10 @@ ret_code_t fds_verify_crc_on_writes(bool enabled);
 #endif
 
 /** @} */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FDS_H__

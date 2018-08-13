@@ -11,7 +11,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_gls Glucose Service
+ * @defgroup ble_gls Glucose Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Glucose Service module.
@@ -34,6 +34,10 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 #include "ble_date_time.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Glucose feature */
 #define BLE_GLS_FEATURE_LOW_BATT                       0x0001  /**< Low Battery Detection During Measurement Supported */
@@ -257,6 +261,11 @@ void ble_gls_on_ble_evt(ble_gls_t * p_gls, ble_evt_t * p_ble_evt);
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_gls_glucose_new_meas(ble_gls_t * p_gls, ble_gls_rec_t * p_rec);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_GLS_H__
 

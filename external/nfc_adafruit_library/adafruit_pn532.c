@@ -28,11 +28,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "sdk_config.h"
+#if ADAFRUIT_PN532_ENABLED
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
 #include "adafruit_pn532.h"
-#include "adafruit_pn532_config.h"
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
 #include "nrf_drv_twi.h"
@@ -117,7 +118,7 @@ static adafruit_pn532 pn532_object = {
     ._hardwareSPI = false
 };
 
-static const nrf_drv_twi_t m_twi_master = NRF_DRV_TWI_INSTANCE(MASTER_TWI_INST);
+static const nrf_drv_twi_t m_twi_master = NRF_DRV_TWI_INSTANCE(PN532_CONFIG_TWI_INSTANCE);
 
 static uint8_t pn532_packet_buf[PN532_PACKBUFFSIZ];
 
@@ -269,8 +270,11 @@ ret_code_t adafruit_pn532_create_i2c()
     PN532_LOG("Creating I2C\r\n");
 
     nrf_drv_twi_uninit(&m_twi_master);
+    nrf_drv_twi_config_t twi_config = NRF_DRV_TWI_DEFAULT_CONFIG;
+    twi_config.scl = PN532_CONFIG_SCL;
+    twi_config.sda = PN532_CONFIG_SDA;
 
-    ret_code_t ret = nrf_drv_twi_init(&m_twi_master, NULL, NULL, NULL);
+    ret_code_t ret = nrf_drv_twi_init(&m_twi_master, &twi_config, NULL, NULL);
     if (ret != NRF_SUCCESS)
     {
         PN532_LOG("Failed to initialize TWI, err_code = %d\r\n", ret);
@@ -1033,3 +1037,4 @@ ret_code_t adafruit_pn532_field_off(void)
 {
     return adafruit_pn532_switch_field(RFCONFIGURATION_RFFIELD_OFF);
 }
+#endif //ADAFRUIT_PN532_ENABLED

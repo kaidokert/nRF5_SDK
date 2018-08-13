@@ -163,7 +163,7 @@ void get_power(void)
         }
     }
 
-    switch(c)
+    switch (c)
     {
         case '0':
             txpower_ =  RADIO_TXPOWER_TXPOWER_Pos4dBm;
@@ -209,7 +209,7 @@ void get_power(void)
 void print_parameters(void)
 {
     printf("Parameters:\r\n");
-    switch(mode_)
+    switch (mode_)
     {
         case RADIO_MODE_MODE_Nrf_250Kbit:
             printf("Data rate...........: 250 Kbit/s\r\n");
@@ -224,7 +224,7 @@ void print_parameters(void)
             break;
     }
 
-    switch(txpower_)
+    switch (txpower_)
     {
         case RADIO_TXPOWER_TXPOWER_Pos4dBm:
             printf("TX Power............: +4 dBm\r\n");
@@ -398,11 +398,11 @@ int main(void)
 
             case 'h':
                 help();
-				break;
+                break;
 
             default:
                 // No implementation needed
-				break;
+                break;
         }
 
         switch (test)

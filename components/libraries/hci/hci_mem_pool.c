@@ -9,9 +9,9 @@
  * the file.
  *
  */
-
+#include "sdk_config.h"
+#if HCI_MEM_POOL_ENABLED
 #include "hci_mem_pool.h"
-#include "hci_mem_pool_internal.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -19,7 +19,7 @@
  */
 typedef struct
 {
-    uint8_t  rx_buffer[RX_BUF_SIZE];                                /**< RX buffer memory array. */
+    uint8_t  rx_buffer[HCI_RX_BUF_SIZE];                            /**< RX buffer memory array. */
     uint32_t length;                                                /**< Length of the RX buffer memory array. */
 } rx_buffer_elem_t;
 
@@ -37,7 +37,7 @@ typedef struct
 } rx_buffer_queue_t;
 
 static bool              m_is_tx_allocated;                         /**< Boolean value to determine if the TX buffer is allocated. */
-static rx_buffer_elem_t  m_rx_buffer_elem_queue[RX_BUF_QUEUE_SIZE]; /**< RX buffer element instances. */
+static rx_buffer_elem_t  m_rx_buffer_elem_queue[HCI_RX_BUF_QUEUE_SIZE]; /**< RX buffer element instances. */
 static rx_buffer_queue_t m_rx_buffer_queue;                         /**< RX buffer queue element instance. */
 
 
@@ -45,7 +45,7 @@ uint32_t hci_mem_pool_open(void)
 {
     m_is_tx_allocated                      = false;
     m_rx_buffer_queue.p_buffer             = m_rx_buffer_elem_queue;
-    m_rx_buffer_queue.free_window_count    = RX_BUF_QUEUE_SIZE;
+    m_rx_buffer_queue.free_window_count    = HCI_RX_BUF_QUEUE_SIZE;
     m_rx_buffer_queue.free_available_count = 0;
     m_rx_buffer_queue.read_available_count = 0;
     m_rx_buffer_queue.write_index          = 0;
@@ -64,7 +64,7 @@ uint32_t hci_mem_pool_close(void)
 
 uint32_t hci_mem_pool_tx_alloc(void ** pp_buffer)
 {
-    static uint8_t tx_buffer[TX_BUF_SIZE];
+    static uint8_t tx_buffer[HCI_TX_BUF_SIZE];
 
     uint32_t err_code;
 
@@ -108,7 +108,7 @@ uint32_t hci_mem_pool_rx_produce(uint32_t length, void ** pp_buffer)
 
     if (m_rx_buffer_queue.free_window_count != 0)
     {
-        if (length <= RX_BUF_SIZE)
+        if (length <= HCI_RX_BUF_SIZE)
         {
             --(m_rx_buffer_queue.free_window_count);
             ++(m_rx_buffer_queue.read_available_count);
@@ -122,7 +122,7 @@ uint32_t hci_mem_pool_rx_produce(uint32_t length, void ** pp_buffer)
             // power of two and two's complement arithmetic. For details refer example to book
             // "Making embedded systems: Elicia White".
             m_rx_buffer_queue.write_index =
-                    (m_rx_buffer_queue.write_index + 1u) & (RX_BUF_QUEUE_SIZE - 1u);
+                    (m_rx_buffer_queue.write_index + 1u) & (HCI_RX_BUF_QUEUE_SIZE - 1u);
 
             err_code                      = NRF_SUCCESS;
         }
@@ -152,7 +152,7 @@ uint32_t hci_mem_pool_rx_consume(uint8_t * p_buffer)
         // Start at read_index minus free_available_count and then increment until read index.
         err_code      = NRF_ERROR_INVALID_ADDR;
         consume_index = (m_rx_buffer_queue.read_index - m_rx_buffer_queue.free_available_count) &
-                        (RX_BUF_QUEUE_SIZE - 1u);
+                        (HCI_RX_BUF_QUEUE_SIZE - 1u);
         start_index   = consume_index;
 
         do
@@ -165,7 +165,7 @@ uint32_t hci_mem_pool_rx_consume(uint8_t * p_buffer)
             }
             else
             {
-                consume_index = (consume_index + 1u) & (RX_BUF_QUEUE_SIZE - 1u);
+                consume_index = (consume_index + 1u) & (HCI_RX_BUF_QUEUE_SIZE - 1u);
             }
         }
         while (consume_index != m_rx_buffer_queue.read_index);
@@ -175,7 +175,7 @@ uint32_t hci_mem_pool_rx_consume(uint8_t * p_buffer)
         {
             --(m_rx_buffer_queue.free_available_count);
             ++(m_rx_buffer_queue.free_window_count);
-            start_index = (consume_index + 1u) & (RX_BUF_QUEUE_SIZE - 1u);
+            start_index = (consume_index + 1u) & (HCI_RX_BUF_QUEUE_SIZE - 1u);
         }
     }
     else
@@ -192,7 +192,7 @@ uint32_t hci_mem_pool_rx_data_size_set(uint32_t length)
     // @note: Adjust the write_index making use of the fact that the buffer size is of power
     // of two and two's complement arithmetic. For details refer example to book
     // "Making embedded systems: Elicia White".
-    const uint32_t index = (m_rx_buffer_queue.write_index - 1u) & (RX_BUF_QUEUE_SIZE - 1u);
+    const uint32_t index = (m_rx_buffer_queue.write_index - 1u) & (HCI_RX_BUF_QUEUE_SIZE - 1u);
     m_rx_buffer_queue.p_buffer[index].length = length;
 
     return NRF_SUCCESS;
@@ -222,7 +222,7 @@ uint32_t hci_mem_pool_rx_extract(uint8_t ** pp_buffer, uint32_t * p_length)
         // of two and two's complement arithmetic. For details refer example to book
         // "Making embedded systems: Elicia White".
         m_rx_buffer_queue.read_index =
-            (m_rx_buffer_queue.read_index + 1u) & (RX_BUF_QUEUE_SIZE - 1u);
+            (m_rx_buffer_queue.read_index + 1u) & (HCI_RX_BUF_QUEUE_SIZE - 1u);
 
         err_code                     = NRF_SUCCESS;
     }
@@ -233,3 +233,4 @@ uint32_t hci_mem_pool_rx_extract(uint8_t ** pp_buffer, uint32_t * p_length)
 
     return err_code;
 }
+#endif //HCI_MEM_POOL_ENABLED

@@ -12,7 +12,7 @@
 
 #include "service_if.h"
 #include <stdint.h>
-#include "app_trace.h"
+#include "nrf_log.h"
 
 
 /* Static variables for each service will be generated here
@@ -26,13 +26,13 @@ static void on_rns_evt(ble_dummy_service_t     * p_dummy_service,
     switch (p_evt->evt_type)
     {
         case BLE_dummy_SERVICE_EVT_NOTIFICATION_ENABLED:
-            app_trace_log("[Bluetooth_IF]: DUMMY evt NOTIFICATION_ENABLED. \r\n");
+            NRF_LOG_INFO("[Bluetooth_IF]: DUMMY evt NOTIFICATION_ENABLED. \r\n");
             break;
         case BLE_dummy_SERVICE_EVT_NOTIFICATION_DISABLED:
-            app_trace_log("[Bluetooth_IF]: DUMMY evt NOTIFICATION_DISABLED. \r\n");
+            NRF_LOG_INFO("[Bluetooth_IF]: DUMMY evt NOTIFICATION_DISABLED. \r\n");
             break;
         case BLE_dummy_SERVICE_dummy_EVT_CCCD_WRITE:
-            app_trace_log("[Bluetooth_IF]: DUMMY evt CCCD_WRITE.\r\n");
+            NRF_LOG_INFO("[Bluetooth_IF]: DUMMY evt CCCD_WRITE.\r\n");
             break;
         default:
             // No implementation needed.

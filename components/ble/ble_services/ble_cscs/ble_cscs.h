@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_csc Cycling Speed and Cadence Service
+ * @defgroup ble_cscs Cycling Speed and Cadence Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Cycling Speed and Cadence Service module.
@@ -51,6 +51,10 @@
 #include "ble_srv_common.h"
 #include "ble_sc_ctrlpt.h"
 #include "ble_sensor_location.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @defgroup BLE_CSCS_FEATURES Cycling Speed and Cadence Service feature bits
  * @{ */
@@ -155,6 +159,11 @@ void ble_cscs_on_ble_evt(ble_cscs_t * p_cscs, ble_evt_t * p_ble_evt);
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_cscs_measurement_send(ble_cscs_t * p_cscs, ble_cscs_meas_t * p_measurement);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_CSCS_H__
 

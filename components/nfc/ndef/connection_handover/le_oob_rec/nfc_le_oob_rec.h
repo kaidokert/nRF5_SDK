@@ -25,7 +25,11 @@
 
 #include <stdint.h>
 #include "nfc_ndef_record.h"
-#include "ble_advdata.h"
+#include "nfc_ble_oob_advdata.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Function for generating a description of an NFC NDEF Bluetooth Carrier Configuration LE Record.
  *
@@ -47,4 +51,9 @@ nfc_ndef_record_desc_t * nfc_le_oob_rec_declare(uint8_t                        r
                                                 ble_advdata_t    const * const p_ble_advdata);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_LE_OOB_REC_H__

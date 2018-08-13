@@ -26,6 +26,10 @@
 #include <stdint.h>
 #include "nfc_ndef_record.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @brief Function for generating a description of an NFC NDEF Android Application Record (AAR).
  *
  * This function declares and initializes a static instance of an NFC NDEF record description
@@ -62,4 +66,9 @@ nfc_ndef_record_desc_t * nfc_android_application_rec_declare(uint8_t const * p_p
 nfc_ndef_record_desc_t * nfc_windows_launchapp_rec_declare(const uint8_t * p_win_app_id,
                                                            uint8_t         win_app_id_length);
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_LAUNCHAPP_REC

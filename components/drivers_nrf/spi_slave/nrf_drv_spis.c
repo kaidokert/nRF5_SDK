@@ -10,6 +10,10 @@
  *
  */
 
+#include "sdk_config.h"
+#if SPIS_ENABLED
+#define ENABLED_SPIS_COUNT (SPIS0_ENABLED+SPIS1_ENABLED+SPIS2_ENABLED)
+#if ENABLED_SPIS_COUNT
 #include "nrf_drv_spis.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -17,15 +21,11 @@
 #include "nrf_gpio.h"
 #include "app_error.h"
 #include "app_util_platform.h"
-#include "nrf_drv_config.h"
 #include "nrf_drv_common.h"
 #include "nordic_common.h"
 #include "sdk_common.h"
 #include "nrf_assert.h"
 
-#if !SPIS_COUNT
-    #warning No SPIS instances enabled.
-#else
 
 /**@brief States of the SPI transaction state machine. */
 typedef enum
@@ -50,7 +50,7 @@ typedef enum
     #if SPIS2_ENABLED
         IRQ_HANDLER(2);
     #endif
-    static nrf_drv_irq_handler_t const m_irq_handlers[SPIS_COUNT] = {
+    static nrf_drv_irq_handler_t const m_irq_handlers[ENABLED_SPIS_COUNT] = {
     #if SPIS0_ENABLED
         IRQ_HANDLER_NAME(0),
     #endif
@@ -84,25 +84,13 @@ typedef struct
     volatile nrf_drv_spis_state_t spi_state;       //!< SPI slave state.
 } spis_cb_t;
 
-static spis_cb_t m_cb[SPIS_COUNT];
-
-static nrf_drv_spis_config_t const m_default_config[SPIS_COUNT] = {
-#if SPIS0_ENABLED
-    NRF_DRV_SPIS_DEFAULT_CONFIG(0),
-#endif
-#if SPIS1_ENABLED
-    NRF_DRV_SPIS_DEFAULT_CONFIG(1),
-#endif
-#if SPIS2_ENABLED
-    NRF_DRV_SPIS_DEFAULT_CONFIG(2),
-#endif
-};
-
+static spis_cb_t m_cb[ENABLED_SPIS_COUNT];
 
 ret_code_t nrf_drv_spis_init(nrf_drv_spis_t const * const  p_instance,
                              nrf_drv_spis_config_t const * p_config,
                              nrf_drv_spis_event_handler_t  event_handler)
 {
+    ASSERT(p_config);
     spis_cb_t * p_cb = &m_cb[p_instance->instance_id];
 
     NRF_SPIS_Type * p_spis = p_instance->p_reg;
@@ -111,10 +99,7 @@ ret_code_t nrf_drv_spis_init(nrf_drv_spis_t const * const  p_instance,
     {
         return NRF_ERROR_INVALID_STATE;
     }
-    if (p_config == NULL)
-    {
-        p_config = &m_default_config[p_instance->instance_id];
-    }
+
     if ((uint32_t)p_config->mode > (uint32_t)NRF_DRV_SPIS_MODE_3)
     {
         return NRF_ERROR_INVALID_PARAM;
@@ -394,3 +379,4 @@ static void spis_irq_handler(NRF_SPIS_Type * p_spis, spis_cb_t * p_cb)
 #endif
 
 #endif // SPI_COUNT > 0
+#endif // SPIS_ENABLED

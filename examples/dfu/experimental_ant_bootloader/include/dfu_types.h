@@ -30,6 +30,10 @@
 #include "ant_dfu_constrains.h"
 #include "nrf_mbr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define NRF_UICR_BOOT_START_ADDRESS     (NRF_UICR_BASE + 0x14)                                  /**< Register where the bootloader start address is stored in the UICR register. */
 #define NRF_UICR_NRFFW_1                (NRF_UICR_BASE + 0x18)                                  /**< Register where the MBR retaining address is stored in the UICR register. */
 
@@ -137,6 +141,11 @@ typedef struct
 
 /**@brief Update complete handler type. */
 typedef void (*dfu_complete_handler_t)(dfu_update_status_t dfu_update_status);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DFU_TYPES_H__
 

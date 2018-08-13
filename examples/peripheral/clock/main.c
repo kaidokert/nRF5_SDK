@@ -46,7 +46,8 @@ void setup_example(void)
 
     nrf_gpio_cfg_output(BSP_LED_0);
 
-    err_code = nrf_drv_rtc_init(&rtc, NULL, rtc_evt_handler);
+    nrf_drv_rtc_config_t config = NRF_DRV_RTC_DEFAULT_CONFIG;
+    err_code = nrf_drv_rtc_init(&rtc, &config, rtc_evt_handler);
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_rtc_tick_enable(&rtc, false);

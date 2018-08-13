@@ -16,7 +16,11 @@
 #include "nrf_lpcomp.h"
 #include "sdk_errors.h"
 #include "nrf_drv_common.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @addtogroup nrf_lpcomp LPCOMP HAL and driver
@@ -25,7 +29,7 @@
  * @details The LPCOMP HAL provides basic APIs for accessing the registers of Low Power Comparator.
  * The LPCOMP driver provides APIs on a higher level.
  *
- * @defgroup nrf_drivers_lpcomp LPCOMP driver
+ * @defgroup nrf_drv_lpcomp LPCOMP driver
  * @{
  * @ingroup nrf_lpcomp
  * @brief Low Power Comparator (LPCOMP) driver.
@@ -46,11 +50,11 @@ typedef struct
 } nrf_drv_lpcomp_config_t;
 
 /** @brief LPCOMP driver default configuration including the LPCOMP HAL configuration. */
-#define NRF_DRV_LPCONF_DEFAULT_CONFIG                                              \
-    {                                                                              \
-        .hal                = {LPCOMP_CONFIG_REFERENCE , LPCOMP_CONFIG_DETECTION}, \
-        .input              = LPCOMP_CONFIG_INPUT,                                 \
-        .interrupt_priority = LPCOMP_CONFIG_IRQ_PRIORITY                           \
+#define NRF_DRV_LPCONF_DEFAULT_CONFIG                                                                                     \
+    {                                                                                                                     \
+        .hal                = {(nrf_lpcomp_ref_t)LPCOMP_CONFIG_REFERENCE , (nrf_lpcomp_detect_t)LPCOMP_CONFIG_DETECTION}, \
+        .input              = (nrf_lpcomp_input_t)LPCOMP_CONFIG_INPUT,                                                    \
+        .interrupt_priority = LPCOMP_CONFIG_IRQ_PRIORITY                                                                  \
     }
 
 /**
@@ -103,5 +107,10 @@ void nrf_drv_lpcomp_disable(void);
 /**
  *@}
  **/
+
+
+#ifdef __cplusplus
+}
+#endif
 
  #endif /* NRF_DRV_LPCOMP_H__ */

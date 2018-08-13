@@ -40,6 +40,12 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include the service_changed characteristic. If not enabled, the server's database cannot be changed for the lifetime of the device. */
 
+#if (NRF_SD_BLE_API_VERSION == 3)
+#define NRF_BLE_MAX_MTU_SIZE            GATT_MTU_SIZE_DEFAULT                       /**< MTU size used in the softdevice enabling and to reply to a BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event. */
+#endif
+
+#define APP_FEATURE_NOT_SUPPORTED       BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2        /**< Reply when unsupported features are requested. */
+
 #define CENTRAL_LINK_COUNT              0                                           /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           1                                           /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 
@@ -132,9 +138,10 @@ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t lengt
 {
     for (uint32_t i = 0; i < length; i++)
     {
-        while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+        while (app_uart_put(p_data[i]) != NRF_SUCCESS);
     }
-    while(app_uart_put('\n') != NRF_SUCCESS);
+    while (app_uart_put('\r') != NRF_SUCCESS);
+    while (app_uart_put('\n') != NRF_SUCCESS);
 }
 /**@snippet [Handling the data received over BLE] */
 
@@ -170,7 +177,7 @@ static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
 {
     uint32_t err_code;
 
-    if(p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
+    if (p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
     {
         err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
         APP_ERROR_CHECK(err_code);
@@ -269,25 +276,81 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-            break;
+            break; // BLE_GAP_EVT_CONNECTED
 
         case BLE_GAP_EVT_DISCONNECTED:
             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-            break;
+            break; // BLE_GAP_EVT_DISCONNECTED
 
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
             // Pairing not supported
             err_code = sd_ble_gap_sec_params_reply(m_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
             APP_ERROR_CHECK(err_code);
-            break;
+            break; // BLE_GAP_EVT_SEC_PARAMS_REQUEST
 
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
             // No system attributes have been stored.
             err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
             APP_ERROR_CHECK(err_code);
-            break;
+            break; // BLE_GATTS_EVT_SYS_ATTR_MISSING
+
+        case BLE_GATTC_EVT_TIMEOUT:
+            // Disconnect on GATT Client timeout event.
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTC_EVT_TIMEOUT
+
+        case BLE_GATTS_EVT_TIMEOUT:
+            // Disconnect on GATT Server timeout event.
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTS_EVT_TIMEOUT
+
+        case BLE_EVT_USER_MEM_REQUEST:
+            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gattc_evt.conn_handle, NULL);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_EVT_USER_MEM_REQUEST
+
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+        {
+            ble_gatts_evt_rw_authorize_request_t  req;
+            ble_gatts_rw_authorize_reply_params_t auth_reply;
+
+            req = p_ble_evt->evt.gatts_evt.params.authorize_request;
+
+            if (req.type != BLE_GATTS_AUTHORIZE_TYPE_INVALID)
+            {
+                if ((req.request.write.op == BLE_GATTS_OP_PREP_WRITE_REQ)     ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL))
+                {
+                    if (req.type == BLE_GATTS_AUTHORIZE_TYPE_WRITE)
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+                    }
+                    else
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
+                    }
+                    auth_reply.params.write.gatt_status = APP_FEATURE_NOT_SUPPORTED;
+                    err_code = sd_ble_gatts_rw_authorize_reply(p_ble_evt->evt.gatts_evt.conn_handle,
+                                                               &auth_reply);
+                    APP_ERROR_CHECK(err_code);
+                }
+            }
+        } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
+
+#if (NRF_SD_BLE_API_VERSION == 3)
+        case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+            err_code = sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle,
+                                                       NRF_BLE_MAX_MTU_SIZE);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST
+#endif
 
         default:
             // No implementation needed.
@@ -336,7 +399,11 @@ static void ble_stack_init(void)
 
     //Check the ram settings against the used number of links
     CHECK_RAM_START_ADDR(CENTRAL_LINK_COUNT,PERIPHERAL_LINK_COUNT);
+
     // Enable BLE stack.
+#if (NRF_SD_BLE_API_VERSION == 3)
+    ble_enable_params.gatt_enable_params.att_mtu = NRF_BLE_MAX_MTU_SIZE;
+#endif
     err_code = softdevice_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
 
@@ -368,10 +435,13 @@ void bsp_event_handler(bsp_event_t event)
             break;
 
         case BSP_EVENT_WHITELIST_OFF:
-            err_code = ble_advertising_restart_without_whitelist();
-            if (err_code != NRF_ERROR_INVALID_STATE)
+            if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
             {
-                APP_ERROR_CHECK(err_code);
+                err_code = ble_advertising_restart_without_whitelist();
+                if (err_code != NRF_ERROR_INVALID_STATE)
+                {
+                    APP_ERROR_CHECK(err_code);
+                }
             }
             break;
 
@@ -385,7 +455,7 @@ void bsp_event_handler(bsp_event_t event)
  *
  * @details This function will receive a single character from the app_uart module and append it to
  *          a string. The string will be be sent over BLE when the last character received was a
- *          'new line' i.e '\n' (hex 0x0D) or if the string has reached a length of
+ *          'new line' i.e '\r\n' (hex 0x0D) or if the string has reached a length of
  *          @ref NUS_MAX_DATA_LENGTH.
  */
 /**@snippet [Handling the data received over UART] */
@@ -440,7 +510,7 @@ static void uart_init(void)
         TX_PIN_NUMBER,
         RTS_PIN_NUMBER,
         CTS_PIN_NUMBER,
-        APP_UART_FLOW_CONTROL_ENABLED,
+        APP_UART_FLOW_CONTROL_DISABLED,
         false,
         UART_BAUDRATE_BAUDRATE_Baud115200
     };
@@ -460,9 +530,10 @@ static void uart_init(void)
  */
 static void advertising_init(void)
 {
-    uint32_t      err_code;
-    ble_advdata_t advdata;
-    ble_advdata_t scanrsp;
+    uint32_t               err_code;
+    ble_advdata_t          advdata;
+    ble_advdata_t          scanrsp;
+    ble_adv_modes_config_t options;
 
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
@@ -474,8 +545,8 @@ static void advertising_init(void)
     scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
 
-    ble_adv_modes_config_t options = {0};
-    options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;
+    memset(&options, 0, sizeof(options));
+    options.ble_adv_fast_enabled  = true;
     options.ble_adv_fast_interval = APP_ADV_INTERVAL;
     options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
 

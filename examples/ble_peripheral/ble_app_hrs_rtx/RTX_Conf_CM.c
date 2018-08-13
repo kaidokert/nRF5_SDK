@@ -205,7 +205,7 @@
  *      RTX User configuration part END
  *---------------------------------------------------------------------------*/
 
-#define OS_TRV          ((uint32_t)(((double)OS_CLOCK*(double)OS_TICK)/1E6+0.5)-1)
+#define OS_TRV          ((uint32_t)(((double)OS_CLOCK * (double)OS_TICK) / 1E6 + 0.5) - 1)
 
 
 /*----------------------------------------------------------------------------

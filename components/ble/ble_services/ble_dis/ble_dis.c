@@ -14,7 +14,8 @@
 *  To maintain compliance with Nordic Semiconductor ASAs Bluetooth profile
 *  qualification listings, this section of source code must not be modified.
 */
-
+#include "sdk_config.h"
+#if BLE_DIS_ENABLED
 #include "ble_dis.h"
 
 #include <stdlib.h>
@@ -275,3 +276,4 @@ uint32_t ble_dis_init(const ble_dis_init_t * p_dis_init)
 
     return NRF_SUCCESS;
 }
+#endif //BLE_DIS_ENABLED

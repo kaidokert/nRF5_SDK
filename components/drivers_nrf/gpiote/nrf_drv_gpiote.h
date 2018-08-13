@@ -25,10 +25,14 @@
 
 #include "nrf_gpiote.h"
 #include "nrf_gpio.h"
-#include "nrf_drv_config.h"
 #include "sdk_errors.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "sdk_config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Input pin configuration. */
 typedef struct
@@ -212,8 +216,32 @@ void nrf_drv_gpiote_out_task_disable(nrf_drv_gpiote_pin_t pin);
  * @brief Function for getting the address of a configurable GPIOTE task.
  *
  * @param[in] pin       Pin.
+ *
+ * @return Address of OUT task.
  */
 uint32_t nrf_drv_gpiote_out_task_addr_get(nrf_drv_gpiote_pin_t pin);
+
+#if defined(GPIOTE_FEATURE_SET_PRESENT)
+/**
+ * @brief Function for getting the address of a configurable GPIOTE task.
+ *
+ * @param[in] pin       Pin.
+ *
+ * @return Address of SET task.
+ */
+uint32_t nrf_drv_gpiote_set_task_addr_get(nrf_drv_gpiote_pin_t pin);
+#endif // defined(GPIOTE_FEATURE_SET_PRESENT)
+
+#if defined(GPIOTE_FEATURE_CLR_PRESENT)
+/**
+ * @brief Function for getting the address of a configurable GPIOTE task.
+ *
+ * @param[in] pin       Pin.
+ *
+ * @return Address of CLR task.
+ */
+uint32_t nrf_drv_gpiote_clr_task_addr_get(nrf_drv_gpiote_pin_t pin);
+#endif // defined(GPIOTE_FEATURE_CLR_PRESENT)
 
 /**
  * @brief Function for initializing a GPIOTE input pin.
@@ -296,14 +324,35 @@ uint32_t nrf_drv_gpiote_in_event_addr_get(nrf_drv_gpiote_pin_t pin);
 void nrf_drv_gpiote_out_task_force(nrf_drv_gpiote_pin_t pin, uint8_t state);
 
 /**
- * @brief Function for triggering the task manually.
+ * @brief Function for triggering the task OUT manually.
  *
  * @param[in] pin       Pin.
  */
 void nrf_drv_gpiote_out_task_trigger(nrf_drv_gpiote_pin_t pin);
 
+#ifdef NRF52
+/**
+ * @brief Function for triggering the task SET manually.
+ *
+ * @param[in] pin       Pin.
+ */
+void nrf_drv_gpiote_set_task_trigger(nrf_drv_gpiote_pin_t pin);
+
+/**
+ * @brief Function for triggering the task CLR manually.
+ *
+ * @param[in] pin       Pin.
+ */
+void nrf_drv_gpiote_clr_task_trigger(nrf_drv_gpiote_pin_t pin);
+#endif
+
 /**
  *@}
  **/
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //NRF_DRV_GPIOTE__

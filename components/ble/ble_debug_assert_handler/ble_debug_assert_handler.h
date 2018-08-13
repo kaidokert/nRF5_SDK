@@ -28,6 +28,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief Function for handling the Debug assert, which can be called from an error handler.
  *        To be used only for debugging purposes.
  *
@@ -44,6 +48,11 @@
  * @param[in] p_file_name Pointer to the file name.
  */
 void ble_debug_assert_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BLE_DEBUG_ASSERT_HANDLER_H__ */
 

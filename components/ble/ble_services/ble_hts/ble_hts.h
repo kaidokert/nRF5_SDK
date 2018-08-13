@@ -11,7 +11,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_hts Health Thermometer Service
+ * @defgroup ble_hts Health Thermometer Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Health Thermometer Service module.
@@ -37,6 +37,10 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 #include "ble_date_time.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Temperature Type measurement locations
 #define BLE_HTS_TEMP_TYPE_ARMPIT      1
@@ -154,6 +158,11 @@ uint32_t ble_hts_measurement_send(ble_hts_t * p_hts, ble_hts_meas_t * p_hts_meas
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_hts_is_indication_enabled(ble_hts_t * p_hts, bool * p_indication_enabled);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_HTS_H__
 

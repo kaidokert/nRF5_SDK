@@ -10,11 +10,12 @@
  *
  */
 
+#include "sdk_config.h"
+#if PDM_ENABLED
 #include "nrf_drv_pdm.h"
 #include "nrf_assert.h"
 #include "nrf_drv_common.h"
 #include "nrf_gpio.h"
-
 
 /** @brief PDM interface status. */
 typedef enum
@@ -168,3 +169,4 @@ ret_code_t nrf_drv_pdm_stop(void)
     nrf_pdm_task_trigger(NRF_PDM_TASK_STOP);
     return NRF_SUCCESS;
 }
+#endif //PDM_ENABLED

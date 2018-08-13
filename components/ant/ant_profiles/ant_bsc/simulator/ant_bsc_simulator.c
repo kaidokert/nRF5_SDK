@@ -133,14 +133,14 @@ void ant_bsc_simulator_one_iteration(ant_bsc_simulator_t * p_simulator)
     p_simulator->_cb.fraction_since_last_c_evt += ITERATION_FRACTION(p_simulator->_cb.device_type);
 
     uint32_t add_period = p_simulator->_cb.fraction_since_last_s_evt / ANT_CLOCK_FREQUENCY;
-    if(add_period > 0)
+    if (add_period > 0)
     {
         p_simulator->_cb.time_since_last_s_evt++;
         p_simulator->_cb.fraction_since_last_s_evt %= ANT_CLOCK_FREQUENCY;
     }
 
     add_period = p_simulator->_cb.fraction_since_last_c_evt / ANT_CLOCK_FREQUENCY;
-    if(add_period > 0)
+    if (add_period > 0)
     {
         p_simulator->_cb.time_since_last_c_evt++;
         p_simulator->_cb.fraction_since_last_c_evt %= ANT_CLOCK_FREQUENCY;
@@ -151,7 +151,7 @@ void ant_bsc_simulator_one_iteration(ant_bsc_simulator_t * p_simulator)
                    p_simulator->_cb.prev_time_since_evt;
     p_simulator->_cb.prev_time_since_evt = p_simulator->p_profile->BSC_PROFILE_event_time;
 
-    if(diff >= 0)       // Check for time count overflow
+    if (diff >= 0)       // Check for time count overflow
     {
         // No overflow
         p_simulator->_cb.cumulative_time += diff / TWO_SEC_TO_TICKS;

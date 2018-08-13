@@ -50,7 +50,7 @@
 /** @file
  *  @brief Adafruit PN532 NFC Shield library for reading and writing tags.
  *
- *  @defgroup nrf_external_adafruit_pn532 Adafruit PN532 NFC Shield library
+ *  @defgroup adafruit_pn532 Adafruit PN532 NFC Shield library
  *  @{
  *  @ingroup app_common
  *  @brief Adafruit PN532 NFC Shield library for reading and writing tags.

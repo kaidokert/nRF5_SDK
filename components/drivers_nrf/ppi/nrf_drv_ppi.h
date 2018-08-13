@@ -28,7 +28,7 @@
  * @details The PPI HAL provides basic APIs for accessing the registers of the PPI.
  * The PPI driver provides APIs on a higher level.
  *
- * @defgroup lib_driver_ppi PPI driver
+ * @defgroup nrf_drv_ppi PPI driver
  * @{
  * @ingroup  nrf_ppi
  *
@@ -37,19 +37,19 @@
 
 #include "sdk_resources.h"
 
-#ifdef NRF52
-
-    #define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFFFFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
-    #define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x000FFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
-    #define NRF_PPI_ALL_APP_GROUPS_MASK     ((uint32_t)0x0000003FuL & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
-
-#else
-
-    #define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFF0FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
-    #define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x0000FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
-    #define NRF_PPI_ALL_APP_GROUPS_MASK     ((uint32_t)0x0000000FuL & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#if PPI_CH_NUM > 16
+#define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFFFFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
+#define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x000FFFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
+#else
+#define NRF_PPI_ALL_APP_CHANNELS_MASK   ((uint32_t)0xFFF0FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< All PPI channels available to the application. */
+#define NRF_PPI_PROG_APP_CHANNELS_MASK  ((uint32_t)0x0000FFFFuL & ~(NRF_PPI_CHANNELS_USED))  /**< Programmable PPI channels available to the application. */
+#endif
+
+#define NRF_PPI_ALL_APP_GROUPS_MASK     (((1uL << PPI_GROUP_NUM) - 1) & ~(NRF_PPI_GROUPS_USED))    /**< All PPI groups available to the application. */
 
 
 /**@brief Function for initializing PPI module.
@@ -281,4 +281,9 @@ __STATIC_INLINE uint32_t nrf_drv_ppi_task_addr_group_disable_get(nrf_ppi_channel
  **/
 
 /*lint --flb "Leave library region" */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NRF_DRV_PPI_H

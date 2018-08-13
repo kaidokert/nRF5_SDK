@@ -60,7 +60,7 @@ void wdt_event_handler(void)
 void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
 {
     LEDS_OFF(LEDS_MASK);
-    while(1);
+    while (1);
 }
 
 /**
@@ -68,7 +68,7 @@ void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
  */
 void bsp_event_callback(bsp_event_t event)
 {
-    switch(event)
+    switch (event)
     {
         case BSP_EVENT_KEY_0:
             nrf_drv_wdt_channel_feed(m_channel_id);
@@ -100,14 +100,6 @@ int main(void)
     LEDS_CONFIGURE(LEDS_MASK);
     LEDS_OFF(LEDS_MASK);
 
-    //Indicate program start on LEDs.
-    for(uint32_t i = 0; i < LEDS_NUMBER; i++)
-    {   nrf_delay_ms(200);
-        LEDS_ON(BSP_LED_0_MASK << i);
-    }
-     err_code = bsp_buttons_enable();
-     APP_ERROR_CHECK(err_code);
-
     //Configure WDT.
     nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
     err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
@@ -116,7 +108,15 @@ int main(void)
     APP_ERROR_CHECK(err_code);
     nrf_drv_wdt_enable();
 
-    while(1)
+    //Indicate program start on LEDs.
+    for (uint32_t i = 0; i < LEDS_NUMBER; i++)
+    {   nrf_delay_ms(200);
+        LEDS_ON(BSP_LED_0_MASK << i);
+    }
+     err_code = bsp_buttons_enable();
+     APP_ERROR_CHECK(err_code);
+
+    while (1)
     {
         __SEV();
         __WFE();

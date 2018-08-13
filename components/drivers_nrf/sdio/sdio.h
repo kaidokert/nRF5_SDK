@@ -18,6 +18,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file
 * @brief 2-wire serial interface driver (compatible with ADNS2080 mouse sensor driver)
 *
@@ -66,4 +70,9 @@ void sdio_write_byte(uint8_t address, uint8_t data_byte);
  **/
 
 /*lint --flb "Leave library region" */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

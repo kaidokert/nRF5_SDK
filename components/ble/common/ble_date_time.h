@@ -31,6 +31,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief Date and Time structure. */
 typedef struct
 {
@@ -70,6 +74,11 @@ static __INLINE uint8_t ble_date_time_decode(ble_date_time_t * p_date_time,
 
     return len;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_DATE_TIME_H__
 

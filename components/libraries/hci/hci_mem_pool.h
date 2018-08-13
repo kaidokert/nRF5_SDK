@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup memory_pool Memory pool
+ * @defgroup hci_mem_pool Memory pool
  * @{
  * @ingroup app_common
  *
@@ -47,6 +47,10 @@
 
 #include <stdint.h>
 #include "nrf_error.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Function for opening the module.
  *
@@ -126,6 +130,11 @@ uint32_t hci_mem_pool_rx_extract(uint8_t ** pp_buffer, uint32_t * p_length);
  * @retval NRF_ERROR_INVALID_ADDR  Operation failure. Not a valid pointer.
  */
 uint32_t hci_mem_pool_rx_consume(uint8_t * p_buffer);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HCI_MEM_POOL_H__
 

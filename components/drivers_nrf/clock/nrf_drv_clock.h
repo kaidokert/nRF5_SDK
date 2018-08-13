@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
+/* Copyright (c) 2016 Nordic Semiconductor. All Rights Reserved.
  *
  * The information contained herein is property of Nordic Semiconductor ASA.
  * Terms and conditions of usage are described in detail in NORDIC
@@ -18,8 +18,12 @@
 #include "sdk_errors.h"
 #include "nrf_assert.h"
 #include "nrf_clock.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
 #include "nrf_drv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  *
@@ -29,7 +33,7 @@
  * @details The clock HAL provides basic APIs for accessing the registers of the clock.
  * The clock driver provides APIs on a higher level.
  *
- * @defgroup nrf_clock_drv Clock driver
+ * @defgroup nrf_drv_clock Clock driver
  * @{
  * @ingroup nrf_clock
  * @brief Driver for managing the low-frequency clock (LFCLK) and the high-frequency clock (HFCLK).
@@ -220,11 +224,33 @@ __STATIC_INLINE uint32_t nrf_drv_clock_ppi_task_addr(nrf_clock_task_t task);
  */
 __STATIC_INLINE uint32_t nrf_drv_clock_ppi_event_addr(nrf_clock_event_t event);
 
+
+#ifdef SOFTDEVICE_PRESENT
 /**
  * @brief Function called by the SoftDevice handler if an @ref nrf_soc event is received from the SoftDevice.
+ *
+ * @param[in] evt_id One of NRF_SOC_EVTS values.
  */
-#ifdef SOFTDEVICE_PRESENT
 void nrf_drv_clock_on_soc_event(uint32_t evt_id);
+
+/**
+ * @brief Function called by the SoftDevice handler when the SoftDevice has been enabled.
+ *
+ * This function is called just after the SoftDevice has been properly enabled.
+ * Its main purpose is to mark that LFCLK has been requested by SD.
+ */
+void nrf_drv_clock_on_sd_enable(void);
+
+/**
+ * @brief Function called by the SoftDevice handler when the SoftDevice has been disabled.
+ *
+ * This function is called just after the SoftDevice has been properly disabled.
+ * It has two purposes:
+ * 1. Releases the LFCLK from the SD.
+ * 2. Reinitializes an interrupt after the SD releases POWER_CLOCK_IRQ.
+ */
+void nrf_drv_clock_on_sd_disable(void);
+
 #endif
 /**
  *@}
@@ -243,4 +269,9 @@ __STATIC_INLINE uint32_t nrf_drv_clock_ppi_event_addr(nrf_clock_event_t event)
 #endif //SUPPRESS_INLINE_IMPLEMENTATION
 
 /*lint --flb "Leave library region" */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NRF_CLOCK_H__

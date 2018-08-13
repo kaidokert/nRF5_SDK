@@ -12,7 +12,7 @@
 
 /**@file
  *
- * @defgroup ble_sdk_lib_db_discovery Database Discovery
+ * @defgroup ble_db_discovery Database Discovery
  * @{
  * @ingroup  ble_sdk_lib
  * @brief    Database discovery module.
@@ -42,11 +42,15 @@
 #define BLE_DB_DISCOVERY_H__
 
 #include <stdint.h>
-#include "ble_gattc.h"
-#include "ble.h"
 #include "nrf_error.h"
+#include "ble.h"
+#include "ble_gattc.h"
 #include "ble_srv_common.h"
 #include "ble_gatt_db.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 #define BLE_DB_DISCOVERY_MAX_SRV          6  /**< Maximum number of services supported by this module. This also indicates the maximum number of users allowed to be registered to this module. (one user per service). */
@@ -174,6 +178,11 @@ uint32_t ble_db_discovery_start(ble_db_discovery_t * const p_db_discovery,
  */
 void ble_db_discovery_on_ble_evt(ble_db_discovery_t * const p_db_discovery,
                                  const ble_evt_t * const    p_ble_evt);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_DB_DISCOVERY_H__
 

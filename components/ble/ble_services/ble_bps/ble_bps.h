@@ -11,7 +11,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_bps Blood Pressure Service
+ * @defgroup ble_bps Blood Pressure Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Blood Pressure Service module.
@@ -37,6 +37,10 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 #include "ble_date_time.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Blood Pressure Feature bits
 #define BLE_BPS_FEATURE_BODY_MOVEMENT_BIT               (0x01 << 0)         /**< Body Movement Detection Support bit. */
@@ -155,6 +159,11 @@ uint32_t ble_bps_measurement_send(ble_bps_t * p_bps, ble_bps_meas_t * p_bps_meas
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
 uint32_t ble_bps_is_indication_enabled(ble_bps_t * p_bps, bool * p_indication_enabled);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_BPS_H__
 

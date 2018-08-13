@@ -14,7 +14,8 @@
 *  To maintain compliance with Nordic Semiconductor ASAs Bluetooth profile
 *  qualification listings, this section of source code must not be modified.
 */
-
+#include "sdk_config.h"
+#if BLE_BAS_ENABLED
 #include "ble_bas.h"
 #include <string.h>
 #include "nordic_common.h"
@@ -314,3 +315,4 @@ uint32_t ble_bas_battery_level_update(ble_bas_t * p_bas, uint8_t battery_level)
 
     return err_code;
 }
+#endif //BLE_BAS_ENABLED

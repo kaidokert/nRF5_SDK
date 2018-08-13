@@ -11,7 +11,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_ancs_c Apple Notification Service client
+ * @defgroup ble_ancs_c Apple Notification Service client
  * @{
  * @ingroup ble_sdk_srv
  *
@@ -81,8 +81,11 @@
 
 #include "ble_types.h"
 #include "ble_srv_common.h"
-#include "device_manager.h"
 #include "ble_db_discovery.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 #define BLE_ANCS_ATTR_DATA_MAX              32  /**< Maximum data length of an iOS notification attribute. */
@@ -412,6 +415,11 @@ uint32_t ble_ancs_c_request_attrs(ble_ancs_c_t                 * p_ancs,
  * @retval    NRF_ERROR_NULL If a p_ancs was a NULL pointer.
  */
 uint32_t ble_ancs_c_handles_assign(ble_ancs_c_t * p_ancs, const uint16_t conn_handle, const ble_ancs_c_service_t * p_service);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_ANCS_C_H__
 

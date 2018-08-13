@@ -1,3 +1,5 @@
+#include "sdk_config.h"
+#if BLE_NUS_C_ENABLED
 #include <stdlib.h> // definition of NULL
 
 #include "ble.h"
@@ -210,3 +212,4 @@ uint32_t ble_nus_c_handles_assign(ble_nus_c_t * p_ble_nus,
     }
     return NRF_SUCCESS;
 }
+#endif //BLE_NUS_C_ENABLED

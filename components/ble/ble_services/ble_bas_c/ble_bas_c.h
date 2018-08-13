@@ -9,7 +9,7 @@
 
 /**@file
  *
- * @defgroup ble_sdk_srv_bas_c Battery Service Client
+ * @defgroup ble_bas_c Battery Service Client
  * @{
  * @ingroup  ble_sdk_srv
  * @brief    Battery Service Client module.
@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include "ble.h"
 #include "ble_db_discovery.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @defgroup bas_c_enums Enumerations
@@ -206,6 +210,11 @@ uint32_t ble_bas_c_handles_assign(ble_bas_c_t *    p_ble_bas_c,
                                   ble_bas_c_db_t * p_peer_handles);
 
 /** @} */ // End tag for Function group.
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_BAS_C_H__
 

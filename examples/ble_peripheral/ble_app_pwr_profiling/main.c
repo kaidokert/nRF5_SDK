@@ -41,8 +41,14 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT     0                                       /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
+#if (NRF_SD_BLE_API_VERSION == 3)
+#define NRF_BLE_MAX_MTU_SIZE                GATT_MTU_SIZE_DEFAULT                   /**< MTU size used in the softdevice enabling and to reply to a BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event. */
+#endif
+
 #define CENTRAL_LINK_COUNT                  0                                       /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT               1                                       /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
+
+#define APP_FEATURE_NOT_SUPPORTED           BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2    /**< Reply when unsupported features are requested. */
 
 // User-modifiable configuration parameters.
 //      The following values shall be altered when doing power profiling.
@@ -527,7 +533,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     {
         case BLE_GAP_EVT_CONNECTED:
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-            break;
+            break; // BLE_GAP_EVT_CONNECTED
 
         case BLE_GAP_EVT_DISCONNECTED:
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
@@ -537,7 +543,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             // Go to system-off mode
             err_code = sd_power_system_off();
             APP_ERROR_CHECK(err_code);
-            break;
+            break; // BLE_GAP_EVT_DISCONNECTED
 
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
             err_code = sd_ble_gatts_sys_attr_set(m_conn_handle,
@@ -545,7 +551,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                                                  0,
                                                  BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS | BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS);
             APP_ERROR_CHECK(err_code);
-            break;
+            break; // BLE_GATTS_EVT_SYS_ATTR_MISSING
 
         case BLE_GAP_EVT_TIMEOUT:
             if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISING)
@@ -554,11 +560,67 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
                 err_code = sd_power_system_off();
                 APP_ERROR_CHECK(err_code);
             }
-            break;
+            break; // BLE_GAP_EVT_TIMEOUT
+
+        case BLE_GATTC_EVT_TIMEOUT:
+            // Disconnect on GATT Client timeout event.
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTC_EVT_TIMEOUT
+
+        case BLE_GATTS_EVT_TIMEOUT:
+            // Disconnect on GATT Server timeout event.
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTS_EVT_TIMEOUT
 
         case BLE_GATTS_EVT_WRITE:
             on_write(p_ble_evt);
-            break;
+            break; // BLE_GATTS_EVT_WRITE
+
+        case BLE_EVT_USER_MEM_REQUEST:
+            err_code = sd_ble_user_mem_reply(p_ble_evt->evt.gattc_evt.conn_handle, NULL);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_EVT_USER_MEM_REQUEST
+
+        case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
+        {
+            ble_gatts_evt_rw_authorize_request_t  req;
+            ble_gatts_rw_authorize_reply_params_t auth_reply;
+
+            req = p_ble_evt->evt.gatts_evt.params.authorize_request;
+
+            if (req.type != BLE_GATTS_AUTHORIZE_TYPE_INVALID)
+            {
+                if ((req.request.write.op == BLE_GATTS_OP_PREP_WRITE_REQ)     ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) ||
+                    (req.request.write.op == BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL))
+                {
+                    if (req.type == BLE_GATTS_AUTHORIZE_TYPE_WRITE)
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+                    }
+                    else
+                    {
+                        auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_READ;
+                    }
+                    auth_reply.params.write.gatt_status = APP_FEATURE_NOT_SUPPORTED;
+                    err_code = sd_ble_gatts_rw_authorize_reply(p_ble_evt->evt.gatts_evt.conn_handle,
+                                                               &auth_reply);
+                    APP_ERROR_CHECK(err_code);
+                }
+            }
+        } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
+
+#if (NRF_SD_BLE_API_VERSION == 3)
+        case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+            err_code = sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle,
+                                                       NRF_BLE_MAX_MTU_SIZE);
+            APP_ERROR_CHECK(err_code);
+            break; // BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST
+#endif
 
         default:
             // No implementation needed.
@@ -616,6 +678,9 @@ static void ble_stack_init(void)
     CHECK_RAM_START_ADDR(CENTRAL_LINK_COUNT,PERIPHERAL_LINK_COUNT);
 
     // Enable BLE stack.
+#if (NRF_SD_BLE_API_VERSION == 3)
+    ble_enable_params.gatt_enable_params.att_mtu = NRF_BLE_MAX_MTU_SIZE;
+#endif
     err_code = softdevice_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
 

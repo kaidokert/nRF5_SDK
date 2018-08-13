@@ -9,6 +9,8 @@
  * the file.
  *
  */
+#include "sdk_config.h"
+#if LOW_POWER_PWM_ENABLED
 #include <string.h>
 #include "low_power_pwm.h"
 #include "nrf_gpio.h"
@@ -73,7 +75,7 @@ static void pwm_timeout_handler(void * p_context)
 
     p_pwm_instance->pwm_state = NRF_DRV_STATE_INITIALIZED;
 
-    if(p_pwm_instance->evt_type == LOW_POWER_PWM_EVENT_PERIOD)
+    if (p_pwm_instance->evt_type == LOW_POWER_PWM_EVENT_PERIOD)
     {
         if (p_pwm_instance->handler)
         {
@@ -82,7 +84,7 @@ static void pwm_timeout_handler(void * p_context)
 
         duty_cycle = p_pwm_instance->duty_cycle;
 
-        if(duty_cycle == p_pwm_instance->period)    // Process duty cycle 100%
+        if (duty_cycle == p_pwm_instance->period)    // Process duty cycle 100%
         {
             led_on(p_pwm_instance);
             p_pwm_instance->timeout_ticks = p_pwm_instance->period + APP_TIMER_MIN_TIMEOUT_TICKS;
@@ -95,7 +97,7 @@ static void pwm_timeout_handler(void * p_context)
         else // Process any other duty cycle than 0 or 100%
         {
             led_on(p_pwm_instance);
-            p_pwm_instance->timeout_ticks = ((duty_cycle*p_pwm_instance->period)>>8) +
+            p_pwm_instance->timeout_ticks = ((duty_cycle * p_pwm_instance->period)>>8) +
                                 APP_TIMER_MIN_TIMEOUT_TICKS;
             // setting next state
             p_pwm_instance->evt_type = LOW_POWER_PWM_EVENT_DUTY_CYCLE;
@@ -105,12 +107,13 @@ static void pwm_timeout_handler(void * p_context)
     {
         led_off(p_pwm_instance);
         p_pwm_instance->evt_type = LOW_POWER_PWM_EVENT_PERIOD;
-        p_pwm_instance->timeout_ticks = (((p_pwm_instance->period - p_pwm_instance->duty_cycle)*p_pwm_instance->period)>>8) +
+        p_pwm_instance->timeout_ticks = (((p_pwm_instance->period - p_pwm_instance->duty_cycle) * p_pwm_instance->period)>>8) +
                                   APP_TIMER_MIN_TIMEOUT_TICKS;
     }
 
     if (p_pwm_instance->pwm_state == NRF_DRV_STATE_INITIALIZED)
     {
+        p_pwm_instance->pwm_state = NRF_DRV_STATE_POWERED_ON;
         err_code = app_timer_start(*p_pwm_instance->p_timer_id, p_pwm_instance->timeout_ticks, p_pwm_instance);
         APP_ERROR_CHECK(err_code);
     }
@@ -165,15 +168,15 @@ ret_code_t low_power_pwm_init(low_power_pwm_t * p_pwm_instance, low_power_pwm_co
 ret_code_t low_power_pwm_start(low_power_pwm_t * p_pwm_instance,
                              uint32_t          leds_pin_bit_mask)
 {
-    ASSERT(p_pwm_instance->pwm_state == NRF_DRV_STATE_INITIALIZED);
-    ASSERT(((~p_pwm_instance->bit_mask) & leds_pin_bit_mask) == false);
+    ASSERT(p_pwm_instance->pwm_state != NRF_DRV_STATE_UNINITIALIZED);
+    ASSERT(((p_pwm_instance->bit_mask) & leds_pin_bit_mask) != 0x00);
 
     p_pwm_instance->pwm_state = NRF_DRV_STATE_POWERED_ON;
     p_pwm_instance->bit_mask_toggle = leds_pin_bit_mask;
 
     led_off(p_pwm_instance);
 
-    p_pwm_instance->bit_mask = leds_pin_bit_mask;
+    p_pwm_instance->bit_mask |= leds_pin_bit_mask;
     p_pwm_instance->evt_type = LOW_POWER_PWM_EVENT_PERIOD;
     pwm_timeout_handler(p_pwm_instance);
 
@@ -214,3 +217,4 @@ ret_code_t low_power_pwm_duty_set(low_power_pwm_t * p_pwm_instance, uint8_t duty
 
     return NRF_SUCCESS;
 }
+#endif //LOW_POWER_PWM_ENABLED

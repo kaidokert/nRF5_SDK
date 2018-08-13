@@ -38,6 +38,7 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
  *   __bss_end__
  *   __end__
  *   end
+ *   __HeapBase
  *   __HeapLimit
  *   __StackLimit
  *   __StackTop
@@ -134,9 +135,10 @@ SECTIONS
 
     .heap (COPY):
     {
+        __HeapBase = .;
         __end__ = .;
         PROVIDE(end = .);
-        *(.heap*)
+        KEEP(*(.heap*))
         __HeapLimit = .;
     } > RAM
 
@@ -145,7 +147,7 @@ SECTIONS
      * values to stack symbols later */
     .stack_dummy (COPY):
     {
-        *(.stack*)
+        KEEP(*(.stack*))
     } > RAM
 
     /* Set stack top to end of RAM, and stack limit move down by
@@ -157,4 +159,3 @@ SECTIONS
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
 }
-

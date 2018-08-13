@@ -11,9 +11,13 @@
  */
 
 #include "nrf_adc.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
 #include "sdk_errors.h"
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @addtogroup nrf_adc ADC HAL and driver
@@ -22,7 +26,7 @@
  * @details The ADC HAL provides basic APIs for accessing the registers of the analog-to-digital converter.
  * The ADC driver provides APIs on a higher level.
  *
- * @defgroup nrf_adc_drv ADC driver
+ * @defgroup nrf_drv_adc ADC driver
  * @{
  * @ingroup nrf_adc
  * @brief Analog-to-digital converter (ADC) driver.
@@ -86,7 +90,7 @@ typedef struct
  */
 typedef struct
 {
-    uint32_t resolution        :2; ///< 8-10 bit resolution.
+    uint32_t resolution        :2; ///< 8 - 10 bit resolution.
     uint32_t input             :3; ///< Input selection and scaling.
     uint32_t reference         :2; ///< Reference source.
     uint32_t reserved          :1; ///< Unused bit fields.
@@ -272,7 +276,7 @@ __STATIC_INLINE nrf_adc_config_input_t nrf_drv_adc_gpio_to_ain(uint32_t pin)
     // AIN2 - AIN7
     if (pin >= 1 && pin <= 6)
     {
-        return (nrf_adc_config_input_t)(1 << (pin+1));
+        return (nrf_adc_config_input_t)(1 << (pin + 1));
     }
     // AIN0 - AIN1
     else if (pin >= 26 && pin <= 27)
@@ -284,5 +288,10 @@ __STATIC_INLINE nrf_adc_config_input_t nrf_drv_adc_gpio_to_ain(uint32_t pin)
         return NRF_ADC_CONFIG_INPUT_DISABLED;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 /** @} */

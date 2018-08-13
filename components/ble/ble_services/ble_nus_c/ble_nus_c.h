@@ -9,7 +9,7 @@
 
 /**@file
  *
- * @defgroup ble_sdk_srv_nus_c   Nordic UART Service Client
+ * @defgroup ble_nus_c Nordic UART Service Client
  * @{
  * @ingroup  ble_sdk_srv
  * @brief    Nordic UART Service Client module.
@@ -32,6 +32,10 @@
 #include "ble.h"
 #include "ble_gatt.h"
 #include "ble_db_discovery.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define NUS_BASE_UUID                  {{0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E}} /**< Used vendor specific UUID. */
 #define BLE_UUID_NUS_SERVICE           0x0001                      /**< The UUID of the Nordic UART Service. */
@@ -186,6 +190,11 @@ uint32_t ble_nus_c_string_send(ble_nus_c_t * p_ble_nus_c, uint8_t * p_string, ui
  */
 uint32_t ble_nus_c_handles_assign(ble_nus_c_t * p_ble_nus_c, const uint16_t conn_handle, const ble_nus_c_handles_t * p_peer_handles);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_NUS_C_H__
 

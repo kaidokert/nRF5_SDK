@@ -45,6 +45,10 @@
 #include <stdint.h>
 #include "nrf_error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup sdk_err_base Base defined for SDK Modules
  * @{
@@ -57,8 +61,9 @@
  * @defgroup sdk_module_codes Codes reserved as identification for module where the error occurred.
  * @{
  */
-#define DEVICE_MANAGER_ERR_BASE   (0x8000)
 #define MEMORY_MANAGER_ERR_BASE   (0x8100)
+#define PERIPH_DRIVERS_ERR_BASE   (0x8200)
+#define GAZELLE_ERR_BASE          (0x8300)
 /* @} */
 
 
@@ -87,13 +92,12 @@
 
 
 /**
- * @defgroup dm_specific_errors Error / status codes specific to device manager.
+ * @defgroup drv_specific_errors Error / status codes specific to drivers.
  * @{
  */
-#define DM_NO_APP_CONTEXT                (DEVICE_MANAGER_ERR_BASE + 0x0040)
-#define DM_SERVICE_CONTEXT_NOT_APPLIED   (DEVICE_MANAGER_ERR_BASE + 0x0041)
-#define DM_CONTEXT_INFO_LOST             (DEVICE_MANAGER_ERR_BASE + 0x0042)
-#define DM_DEVICE_CONTEXT_FULL           (DEVICE_MANAGER_ERR_BASE + 0x0043)
+#define DRV_TWI_ERR_OVERRUN              (PERIPH_DRIVERS_ERR_BASE + 0x0000)
+#define DRV_TWI_ERR_ANACK                (PERIPH_DRIVERS_ERR_BASE + 0x0001)
+#define DRV_TWI_ERR_DNACK                (PERIPH_DRIVERS_ERR_BASE + 0x0002)
 /* @} */
 
 /**
@@ -110,6 +114,11 @@
 typedef uint32_t ret_code_t;
 /** @} */
 /** @} */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SDK_ERRORS_H__
 

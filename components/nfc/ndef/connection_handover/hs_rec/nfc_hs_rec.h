@@ -27,6 +27,10 @@
 #include "nfc_ndef_record.h"
 #include "nfc_ndef_msg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Handover Select record payload descriptor.
  */
@@ -122,4 +126,9 @@ ret_code_t nfc_hs_rec_local_record_add(nfc_ndef_record_desc_t * p_hs_rec,
                                        nfc_ndef_record_desc_t * p_local_rec);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_HS_REC_H__

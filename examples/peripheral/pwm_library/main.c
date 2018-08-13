@@ -55,7 +55,7 @@ int main(void)
     app_pwm_enable(&PWM1);
 
     uint32_t value;
-    while(true)
+    while (true)
     {
         for (uint8_t i = 0; i < 40; ++i)
         {
@@ -66,7 +66,7 @@ int main(void)
             while (app_pwm_channel_duty_set(&PWM1, 0, value) == NRF_ERROR_BUSY);
 
             /* ... or wait for callback. */
-            while(!ready_flag);
+            while (!ready_flag);
             APP_ERROR_CHECK(app_pwm_channel_duty_set(&PWM1, 1, value));
             nrf_delay_ms(25);
         }

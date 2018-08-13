@@ -35,6 +35,10 @@
 #include "ble_advdata.h"
 #include "sdk_errors.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Types of BLE pairing message.
  *
@@ -158,4 +162,9 @@ ret_code_t nfc_ble_pair_default_msg_encode( nfc_ble_pair_type_t            nfc_b
                                             uint32_t               *       p_len);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_BLE_PAIR_MSG_H__

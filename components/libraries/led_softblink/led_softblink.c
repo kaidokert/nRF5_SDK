@@ -9,6 +9,8 @@
  * the file.
  *
  */
+#include "sdk_config.h"
+#if LED_SOFTBLINK_ENABLED
 #include <string.h>
 #include "led_softblink.h"
 #include "nrf_gpio.h"
@@ -48,7 +50,7 @@ static void led_softblink_on_timeout(void * p_context)
     ASSERT(m_led_sb.led_sb_state != NRF_DRV_STATE_UNINITIALIZED);
     ret_code_t err_code;
 
-    if(pause_ticks <= 0)
+    if (pause_ticks <= 0)
     {
         if (m_led_sb.is_counting_up)
         {
@@ -95,7 +97,6 @@ ret_code_t led_softblink_init(led_sb_init_params_t * p_init_params)
     ret_code_t err_code;
 
     ASSERT(m_led_sb.led_sb_state == NRF_DRV_STATE_UNINITIALIZED);
-
     ASSERT(p_init_params);
 
     if ( (p_init_params->duty_cycle_max == 0)                               ||
@@ -199,3 +200,4 @@ ret_code_t led_softblink_uninit(void)
 
     return NRF_SUCCESS;
 }
+#endif //LED_SOFTBLINK_ENABLED

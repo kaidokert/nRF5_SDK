@@ -24,8 +24,6 @@
 #include "ble_dtm.h"
 #include "bsp.h"
 
-// Configuration parameters.
-#define BITRATE  UART_BAUDRATE_BAUDRATE_Baud19200  /**< Serial bitrate on the UART */
 
 // @note: The BLE DTM 2-wire UART standard specifies 8 data bits, 1 stop bit, no flow control.
 //        These parameters are not configurable in the BLE standard.
@@ -49,7 +47,7 @@
  *
  * @note If UART bit rate is changed, this value should be recalculated as well.
  */
-#define MAX_ITERATIONS_NEEDED_FOR_NEXT_BYTE 21
+#define MAX_ITERATIONS_NEEDED_FOR_NEXT_BYTE ((5000 + 2 * UART_POLL_CYCLE) / UART_POLL_CYCLE)
 
 /**@brief Function for UART initialization.
  */
@@ -61,7 +59,7 @@ static void uart_init(void)
 
     NRF_UART0->PSELTXD       = TX_PIN_NUMBER;
     NRF_UART0->PSELRXD       = RX_PIN_NUMBER;
-    NRF_UART0->BAUDRATE      = BITRATE;
+    NRF_UART0->BAUDRATE      = DTM_BITRATE;
 
     // Clean out possible events from earlier operations
     NRF_UART0->EVENTS_RXDRDY = 0;

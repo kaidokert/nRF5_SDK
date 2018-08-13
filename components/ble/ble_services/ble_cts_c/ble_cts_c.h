@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_cts_c Current Time Service client
+ * @defgroup ble_cts_c Current Time Service client
  * @{
  * @ingroup ble_sdk_srv
  * @brief Current Time Service client module.
@@ -48,6 +48,10 @@
 #include "ble_date_time.h"
 #include "ble_db_discovery.h"
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**@brief "Day Date Time" field of the "Exact Time 256" field of the Current Time Characteristic. */
@@ -213,6 +217,11 @@ uint32_t ble_cts_c_current_time_read(ble_cts_c_t const * p_cts);
 uint32_t ble_cts_c_handles_assign(ble_cts_c_t               * p_cts,
                                   const uint16_t              conn_handle,
                                   const ble_cts_c_handles_t * p_peer_handles);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_CTS_C_H__
 

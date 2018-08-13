@@ -14,7 +14,8 @@
 *  To maintain compliance with Nordic Semiconductor ASAs Bluetooth profile
 *  qualification listings, this section of source code must not be modified.
 */
-
+#include "sdk_config.h"
+#if BLE_RSCS_ENABLED
 #include "ble_rscs.h"
 #include <string.h>
 #include "nordic_common.h"
@@ -383,3 +384,4 @@ uint32_t ble_rscs_measurement_send(ble_rscs_t * p_rscs, ble_rscs_meas_t * p_meas
 
     return err_code;
 }
+#endif //BLE_RSCS_ENABLED

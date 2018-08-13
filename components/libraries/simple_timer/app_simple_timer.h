@@ -12,7 +12,7 @@
 
 /**@file
  *
- * @defgroup lib_driver_simple_timer Simple Timer
+ * @defgroup app_simple_timer Simple Timer
  * @{
  * @ingroup  app_common
  *
@@ -29,6 +29,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief Timer time-out handler type. */
 typedef void (*app_simple_timer_timeout_handler_t)(void * p_context);
 
@@ -41,9 +45,7 @@ typedef enum
 
 /**@brief Function for configuring and setting up the timer hardware.
  *
- * @note  Configuration parameters should be set in nrf_drv_config.h file.
- *        The TIMER1_CONFIG_MODE has to be set to NRF_TIMER_MODE_TIMER value.
- *        The TIMER1_CONFIG_BIT_WIDTH has to be set to NRF_TIMER_BIT_WIDTH_16 value.
+ * @note  Timer frequency is configured statically.
  *
  * @retval NRF_SUCCESS             If the operation is successful.
  * @retval NRF_ERROR_INVALID_STATE If the operation fails because the timer is already initialized.
@@ -92,6 +94,11 @@ uint32_t app_simple_timer_stop(void);
  * @retval NRF_SUCCESS             If the operation is successful.
  */
 uint32_t app_simple_timer_uninit(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // TIMER_H__
 

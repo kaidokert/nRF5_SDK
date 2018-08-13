@@ -26,6 +26,10 @@
 #include <stdint.h>
 #include "nfc_ndef_record.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Carrier Power State.
  *
@@ -152,4 +156,9 @@ ret_code_t nfc_ac_rec_auxiliary_data_ref_add(nfc_ndef_record_desc_t * p_ac_rec,
                                              uint8_t                  aux_length);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NFC_AC_REC_H__

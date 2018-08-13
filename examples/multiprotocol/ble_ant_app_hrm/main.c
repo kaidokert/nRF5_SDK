@@ -55,16 +55,21 @@
 #include "sensorsim.h"
 #include "softdevice_handler.h"
 #include "app_timer.h"
-#include "device_manager.h"
 #include "ant_parameters.h"
 #include "ant_interface.h"
-#include "pstorage.h"
-#include "app_trace.h"
 #include "bsp.h"
+#include "peer_manager.h"
+#include "fds.h"
+#include "fstorage.h"
+#include "ble_conn_state.h"
 #include "ant_error.h"
 #include "ant_stack_config.h"
 #include "ant_key_manager.h"
 #include "ant_hrm.h"
+
+#define NRF_LOG_MODULE_NAME "APP"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
 #define WAKEUP_BUTTON_ID                0                                            /**< Button used to wake up the application. */
 #define BOND_DELETE_ALL_BUTTON_ID       1                                            /**< Button used for deleting all bonded centrals during startup. */
@@ -107,7 +112,7 @@
 #define ANT_HRMRX_TRANS_TYPE            0                                            /**< Transmission Type. */
 #define ANTPLUS_NETWORK_NUMBER          0                                            /**< Network number. */
 
-static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;     /**< Handle of the current connection. */
+static volatile uint16_t                m_conn_handle = BLE_CONN_HANDLE_INVALID;     /**< Handle of the current connection. */
 static ble_gap_adv_params_t             m_adv_params;                                /**< Parameters to be passed to the stack when starting advertising. */
 static ble_hrs_t                        m_hrs;                                       /**< Structure used to identify the heart rate service. */
 
@@ -119,10 +124,6 @@ HRM_DISP_CHANNEL_CONFIG_DEF(m_ant_hrm,
                             HRM_MSG_PERIOD_4Hz);
 ant_hrm_profile_t m_ant_hrm;
 
-#ifdef BONDING_ENABLE
-static dm_application_instance_t        m_app_handle;                                /**< Application identifier allocated by device manager */
-static bool                             m_app_initialized   = false;                 /**< Application initialized flag. */
-#endif // BONDING_ENABLE
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -369,7 +370,14 @@ static void conn_params_init(void)
  */
 static void on_ant_evt_channel_closed(void)
 {
-    ant_and_adv_start();
+    if (m_conn_handle != BLE_CONN_HANDLE_INVALID)
+    {
+        ant_hrm_rx_start();
+    }
+    else
+    {
+        ant_and_adv_start();
+    }
 }
 
 
@@ -476,6 +484,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
         case BLE_GAP_EVT_DISCONNECTED:
             err_code = bsp_indication_set(BSP_INDICATE_IDLE);
             APP_ERROR_CHECK(err_code);
+            m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
             // Need to close the ANT channel to make it safe to write bonding information to flash
             err_code = sd_ant_channel_close(ANT_HRMRX_ANT_CHANNEL);
@@ -508,7 +517,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             }
             break;
 
-#ifndef	BONDING_ENABLE
+#ifndef BONDING_ENABLE
             case BLE_GATTS_EVT_SYS_ATTR_MISSING:
                 err_code = sd_ble_gatts_sys_attr_set(m_conn_handle,
                                                      NULL,
@@ -535,7 +544,8 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
 #ifdef BONDING_ENABLE
-    dm_ble_evt_handler(p_ble_evt);
+    ble_conn_state_on_ble_evt(p_ble_evt);
+    pm_on_ble_evt(p_ble_evt);
 #endif // BONDING_ENABLE
 
     ble_hrs_on_ble_evt(&m_hrs, p_ble_evt);
@@ -554,72 +564,177 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
  */
 static void sys_evt_dispatch(uint32_t sys_evt)
 {
-    uint32_t err_code;
-    uint32_t count;
-
-    pstorage_sys_event_handler(sys_evt);
-
-    // Verify if BLE bond data storage access is in progress or not.
-    if (m_app_initialized == true)
-    {
-        err_code = pstorage_access_status_get(&count);
-        if ((err_code == NRF_SUCCESS) && (count == 0))
-        {
-            ant_and_adv_start();
-        }
-    }
-    else
-    {
-        m_app_initialized = true;
-    }
+    ble_advertising_on_sys_evt(sys_evt);
+    /** Dispatch the system event to the Flash Storage module, where it will be
+     *  dispatched to the Flash Data Storage module and from there to the Peer Manager. */
+    fs_sys_event_handler(sys_evt);
 }
 
 
-/**@brief Function for handling the Device Manager events.
+/**@brief Function for handling Peer Manager events.
  *
- * @param[in]   p_evt   Data associated to the device manager event.
+ * @param[in]   p_evt   Peer Manager event.
  */
-static uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
-                                           dm_event_t const     * p_event,
-                                           ret_code_t             event_result)
+static void pm_evt_handler(pm_evt_t const * p_evt)
 {
-    APP_ERROR_CHECK(event_result);
-    return NRF_SUCCESS;
+    ret_code_t err_code;
+
+    switch (p_evt->evt_id)
+    {
+        case PM_EVT_BONDED_PEER_CONNECTED:
+            NRF_LOG_INFO("Connected to previously bonded device\r\n");
+            err_code = pm_peer_rank_highest(p_evt->peer_id);
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            break; // PM_EVT_BONDED_PEER_CONNECTED
+
+        case PM_EVT_CONN_SEC_START:
+            break; // PM_EVT_CONN_SEC_START
+
+        case PM_EVT_CONN_SEC_SUCCEEDED:
+            NRF_LOG_INFO_DEBUG("Link secured. Role: %d. conn_handle: %d, Procedure: %d\r\n",
+                                 ble_conn_state_role(p_evt->conn_handle),
+                                 p_evt->conn_handle,
+                                 p_evt->params.conn_sec_succeeded.procedure);
+            err_code = pm_peer_rank_highest(p_evt->peer_id);
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            #ifdef BLE_DFU_APP_SUPPORT
+            app_context_load(p_evt->conn_handle);
+            #endif // BLE_DFU_APP_SUPPORT
+            break;  // PM_EVT_CONN_SEC_SUCCEEDED
+
+        case PM_EVT_CONN_SEC_FAILED:
+
+            /** In some cases, when securing fails, it can be restarted directly. Sometimes it can
+             *  be restarted, but only after changing some Security Parameters. Sometimes, it cannot
+             *  be restarted until the link is disconnected and reconnected. Sometimes it is
+             *  impossible, to secure the link, or the peer device does not support it. How to
+             *  handle this error is highly application dependent. */
+            switch (p_evt->params.conn_sec_failed.error)
+            {
+                case PM_CONN_SEC_ERROR_PIN_OR_KEY_MISSING:
+                    // Rebond if one party has lost its keys.
+                    err_code = pm_conn_secure(p_evt->conn_handle, true);
+                    if (err_code != NRF_ERROR_INVALID_STATE)
+                    {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break; // PM_EVT_CONN_SEC_FAILED
+
+        case PM_EVT_CONN_SEC_CONFIG_REQ:
+        {
+            // Reject pairing request from an already bonded peer.
+            pm_conn_sec_config_t conn_sec_config = {.allow_repairing = false};
+            pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+        } break; // PM_EVT_CONN_SEC_CONFIG_REQ
+
+        case PM_EVT_STORAGE_FULL:
+            // Run garbage collection on the flash.
+            err_code = fds_gc();
+            if (err_code != NRF_ERROR_BUSY)
+            {
+                APP_ERROR_CHECK(err_code);
+            }
+            break; // PM_EVT_STORAGE_FULL
+
+        case PM_EVT_ERROR_UNEXPECTED:
+            // A likely fatal error occurred. Assert.
+            APP_ERROR_CHECK(p_evt->params.error_unexpected.error);
+            break;
+
+        case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
+            break; // PM_EVT_PEER_DATA_UPDATE_SUCCEEDED
+
+        case PM_EVT_PEER_DATA_UPDATE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK_BOOL(false);
+            break; // PM_EVT_ERROR_UNEXPECTED
+
+        case PM_EVT_PEER_DELETE_SUCCEEDED:
+            break; // PM_EVT_PEER_DELETE_SUCCEEDED
+
+        case PM_EVT_PEER_DELETE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK(p_evt->params.peer_delete_failed.error);
+            break; // PM_EVT_PEER_DELETE_FAILED
+
+        case PM_EVT_PEERS_DELETE_SUCCEEDED:
+            advertising_start();
+            break; // PM_EVT_PEERS_DELETE_SUCCEEDED
+
+        case PM_EVT_PEERS_DELETE_FAILED:
+            // Assert.
+            APP_ERROR_CHECK(p_evt->params.peers_delete_failed_evt.error);
+            break; // PM_EVT_PEERS_DELETE_FAILED
+
+        case PM_EVT_LOCAL_DB_CACHE_APPLIED:
+            break; // PM_EVT_LOCAL_DB_CACHE_APPLIED
+
+        case PM_EVT_LOCAL_DB_CACHE_APPLY_FAILED:
+            // The local database has likely changed, send service changed indications.
+            pm_local_database_has_changed();
+            break; // PM_EVT_LOCAL_DB_CACHE_APPLY_FAILED
+
+        case PM_EVT_SERVICE_CHANGED_IND_SENT:
+            break; // PM_EVT_SERVICE_CHANGED_IND_SENT
+
+        case PM_EVT_SERVICE_CHANGED_IND_CONFIRMED:
+            break; // PM_EVT_SERVICE_CHANGED_IND_SENT
+
+        default:
+            // No implementation needed.
+            break;
+    }
 }
 
 
-/**@brief Function for the Device Manager initialization.
+/**@brief Function for the Peer Manager initialization.
+ *
+ * @param[in] erase_bonds  Indicates whether bonding information should be cleared from
+ *                         persistent storage during initialization of the Peer Manager.
  */
-static void device_manager_init(void)
+static void peer_manager_init(bool erase_bonds)
 {
-    uint32_t                err_code;
-    dm_init_param_t         init_data;
-    dm_application_param_t  register_param;
+    ble_gap_sec_params_t sec_param;
+    ret_code_t           err_code;
 
-    // Initialize persistent storage module.
-    err_code = pstorage_init();
+    err_code = pm_init();
     APP_ERROR_CHECK(err_code);
 
-    // Clear all bonded centrals if the Bonds Delete button is pushed.
-    err_code = bsp_button_is_pressed(BOND_DELETE_ALL_BUTTON_ID,&(init_data.clear_persistent_data));
+    if (erase_bonds)
+    {
+        err_code = pm_peers_delete();
+        APP_ERROR_CHECK(err_code);
+    }
+
+    memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+    // Security parameters to be used for all security procedures.
+    sec_param.bond           = SEC_PARAM_BOND;
+    sec_param.mitm           = SEC_PARAM_MITM;
+    sec_param.io_caps        = SEC_PARAM_IO_CAPABILITIES;
+    sec_param.oob            = SEC_PARAM_OOB;
+    sec_param.min_key_size   = SEC_PARAM_MIN_KEY_SIZE;
+    sec_param.max_key_size   = SEC_PARAM_MAX_KEY_SIZE;
+    sec_param.kdist_own.enc  = 1;
+    sec_param.kdist_own.id   = 1;
+    sec_param.kdist_peer.enc = 1;
+    sec_param.kdist_peer.id  = 1;
+
+    err_code = pm_sec_params_set(&sec_param);
     APP_ERROR_CHECK(err_code);
 
-    err_code = dm_init(&init_data);
-    APP_ERROR_CHECK(err_code);
-
-    memset(&register_param.sec_param, 0, sizeof(ble_gap_sec_params_t));
-
-    register_param.sec_param.timeout      = SEC_PARAM_TIMEOUT;
-    register_param.sec_param.bond         = SEC_PARAM_BOND;
-    register_param.sec_param.mitm         = SEC_PARAM_MITM;
-    register_param.sec_param.io_caps      = SEC_PARAM_IO_CAPABILITIES;
-    register_param.sec_param.oob          = SEC_PARAM_OOB;
-    register_param.sec_param.min_key_size = SEC_PARAM_MIN_KEY_SIZE;
-    register_param.sec_param.max_key_size = SEC_PARAM_MAX_KEY_SIZE;
-    register_param.evt_handler            = device_manager_evt_handler;
-    register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_SRVR_ID;
-
-    err_code = dm_register(&m_app_handle, &register_param);
+    err_code = pm_register(pm_evt_handler);
     APP_ERROR_CHECK(err_code);
 }
 #endif // BONDING_ENABLE
@@ -692,9 +807,12 @@ static void power_manage(void)
 int main(void)
 {
     uint32_t err_code;
+
+    err_code = NRF_LOG_INIT(NULL);
+    APP_ERROR_CHECK(err_code);
+
     // Initialize peripherals
     timers_init();
-    app_trace_init();
 
     // Initialize S332 SoftDevice
     ble_ant_stack_init();
@@ -717,17 +835,16 @@ int main(void)
     APP_ERROR_CHECK(err_code);
 
 #ifdef BONDING_ENABLE
-    uint32_t count;
+    bool erase_bonds;
 
-    // Initialize device manager.
-    device_manager_init();
-
-    err_code = pstorage_access_status_get(&count);
-    if ((err_code == NRF_SUCCESS) && (count == 0))
-#endif // BONDING_ENABLE
+    peer_manager_init(erase_bonds);
+    if (erase_bonds == true)
     {
-        ant_and_adv_start();
+        NRF_LOG_INFO("Bonds erased!\r\n");
     }
+#endif // BONDING_ENABLE
+
+    ant_and_adv_start();
 
     // Enter main loop.
     for (;;)

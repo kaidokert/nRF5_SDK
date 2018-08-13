@@ -10,6 +10,8 @@
  *
  */
 
+#include "sdk_config.h"
+#if ANT_STATE_INDICATOR_ENABLED
 #include "ant_parameters.h"
 #include "bsp.h"
 #include "ant_state_indicator.h"
@@ -127,3 +129,5 @@ void ant_state_indicator_sleep_mode_enter(void)
 /**
  *@}
  */
+
+#endif // ANT_STATE_INDICATOR_ENABLED

@@ -24,12 +24,16 @@
  * Note that all unused pages in this section are not defined and therefore cannot be used.
  * @}
  *
- * @defgroup ant_sdk_common_page80 ANT+ common page 80
+ * @defgroup ant_common_page_80 ANT+ common page 80
  * @{
  * @ingroup ant_sdk_common_pages
  */
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ANT_COMMON_PAGE_80 (80) ///< @brief ID value of common page 80.
 
@@ -79,6 +83,11 @@ void ant_common_page_80_encode(uint8_t * p_page_buffer,
  */
 void ant_common_page_80_decode(uint8_t const * p_page_buffer,
                                volatile ant_common_page80_data_t * p_page_data);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ANT_COMMON_PAGE_80_H__
 /** @} */

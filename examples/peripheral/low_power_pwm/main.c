@@ -50,7 +50,7 @@ static low_power_pwm_t low_power_pwm_2;
  *
  * @param[in] p_context     General purpose pointer (unused).
  */
-void pwm_handler(void * p_context)
+static void pwm_handler(void * p_context)
 {
     uint8_t new_duty_cycle;
     static uint16_t led_0, led_1;
@@ -59,11 +59,11 @@ void pwm_handler(void * p_context)
 
     low_power_pwm_t * pwm_instance = (low_power_pwm_t*)p_context;
 
-    if(pwm_instance->bit_mask == BSP_LED_0_MASK)
+    if (pwm_instance->bit_mask == BSP_LED_0_MASK)
     {
         led_0++;
 
-        if(led_0 > TICKS_BEFORE_CHANGE_0)
+        if (led_0 > TICKS_BEFORE_CHANGE_0)
         {
             new_duty_cycle = pwm_instance->period - pwm_instance->duty_cycle;
             err_code = low_power_pwm_duty_set(pwm_instance, new_duty_cycle);
@@ -71,11 +71,11 @@ void pwm_handler(void * p_context)
             APP_ERROR_CHECK(err_code);
         }
     }
-    else if(pwm_instance->bit_mask == BSP_LED_1_MASK)
+    else if (pwm_instance->bit_mask == BSP_LED_1_MASK)
     {
         led_1++;
 
-        if(led_1 > TICKS_BEFORE_CHANGE_1)
+        if (led_1 > TICKS_BEFORE_CHANGE_1)
         {
             new_duty_cycle = pwm_instance->period - pwm_instance->duty_cycle;
             err_code = low_power_pwm_duty_set(pwm_instance, new_duty_cycle);
@@ -93,7 +93,7 @@ void pwm_handler(void * p_context)
  *
  */
 
-void low_power_init(void)
+static void pwm_init(void)
 {
     uint32_t err_code;
     low_power_pwm_config_t low_power_pwm_config;
@@ -162,7 +162,7 @@ int main(void)
     APP_TIMER_INIT(APP_TIMER_PRESCALER, OP_QUEUES_SIZE, NULL);
 
     /*Initialize low power PWM for all 3  channels of RGB or 3 channels of leds on pca10028*/
-    low_power_init();
+    pwm_init();
 
     while (true)
     {

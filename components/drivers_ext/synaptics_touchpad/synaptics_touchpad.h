@@ -18,13 +18,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file
 * @brief Synaptics Touchpad driver
 *
 *
-* @defgroup nrf_drivers_synaptics_touchpad Synaptics Touchpad driver.
+* @defgroup nrf_drivers_synaptics_touchpad Synaptics Touchpad driver
 * @{
-* @ingroup nrf_drivers
+* @ingroup ext_drivers
 * @brief Synaptics Touchpad driver.
 */
 
@@ -124,5 +128,10 @@ bool touchpad_product_id_verify(void);
  **/
 
 /*lint --flb "Leave library region" */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TOUCHPAD_H__ */

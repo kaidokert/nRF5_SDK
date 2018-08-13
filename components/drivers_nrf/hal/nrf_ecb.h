@@ -31,6 +31,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Function for initializing and powering on the ECB peripheral.
  *
@@ -60,6 +64,11 @@ bool nrf_ecb_crypt(uint8_t * dst, const uint8_t * src);
  * @param key Pointer to the key. 16 bytes will be read.
  */
 void nrf_ecb_set_key(const uint8_t * key);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // NRF_ECB_H__
 

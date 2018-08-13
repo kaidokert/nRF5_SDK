@@ -14,7 +14,8 @@
  * @file
  * @brief SAADC HAL implementation
  */
-
+#include "sdk_config.h"
+#if SAADC_ENABLED
 #include "nrf_saadc.h"
 
 void nrf_saadc_channel_init(uint8_t channel, nrf_saadc_channel_config_t const * const config)
@@ -25,7 +26,10 @@ void nrf_saadc_channel_init(uint8_t channel, nrf_saadc_channel_config_t const * 
             | ((config->gain       << SAADC_CH_CONFIG_GAIN_Pos)   & SAADC_CH_CONFIG_GAIN_Msk)
             | ((config->reference  << SAADC_CH_CONFIG_REFSEL_Pos) & SAADC_CH_CONFIG_REFSEL_Msk)
             | ((config->acq_time   << SAADC_CH_CONFIG_TACQ_Pos)   & SAADC_CH_CONFIG_TACQ_Msk)
-            | ((config->mode       << SAADC_CH_CONFIG_MODE_Pos)   & SAADC_CH_CONFIG_MODE_Msk);
+            | ((config->mode       << SAADC_CH_CONFIG_MODE_Pos)   & SAADC_CH_CONFIG_MODE_Msk)
+            | ((config->burst      << SAADC_CH_CONFIG_BURST_Pos)  & SAADC_CH_CONFIG_BURST_Msk);
     nrf_saadc_channel_input_set(channel, config->pin_p, config->pin_n);
     return;
 }
+#endif //SAADC_ENABLED
+

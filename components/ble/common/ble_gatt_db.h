@@ -23,6 +23,10 @@
 #include "ble.h"
 #include "ble_gattc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BLE_GATT_DB_MAX_CHARS 5       /**< The maximum number of characteristics present in a service record. */
 
 /**@brief Structure for holding the characteristic and the handle of its CCCD present on a server.
@@ -43,6 +47,11 @@ typedef struct
     ble_gattc_handle_range_t handle_range;                              /**< Service Handle Range. */
     ble_gatt_db_char_t       charateristics[BLE_GATT_DB_MAX_CHARS];     /**< Array of information related to the characteristics present in the service. This list can extend further than one. */
 } ble_gatt_db_srv_t;
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BLE_GATT_DB_H__ */
 

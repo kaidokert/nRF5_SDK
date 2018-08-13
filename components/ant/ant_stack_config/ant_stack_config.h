@@ -15,6 +15,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @file
  */
@@ -31,7 +35,7 @@
 /**
  * @brief   Function for configuring and enabling the ANT stack.
  * @details The function sets the channel configuration for the stack using the parameters provided
- *          in the ant_stack_config_defs.h file. It also assigns a correspondingly large buffer
+ *          in the sdk_config.h file. It also assigns a correspondingly large buffer
  *          as static resource.
  *
  * @return A SoftDevice error code.
@@ -41,5 +45,10 @@ uint32_t ant_stack_static_config(void);
 /**
  * @}
  */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ANT_STACK_CONFIG_H__

@@ -27,6 +27,8 @@
 #include "softdevice_handler.h"
 #include "bsp.h"
 #include "app_timer.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
 #define CENTRAL_LINK_COUNT              0                                 /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT           0                                 /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -207,6 +209,9 @@ int main(void)
 {
     uint32_t err_code;
     // Initialize.
+    err_code = NRF_LOG_INIT(NULL);
+    APP_ERROR_CHECK(err_code);
+
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
     err_code = bsp_init(BSP_INIT_LED, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), NULL);
     APP_ERROR_CHECK(err_code);
@@ -214,12 +219,16 @@ int main(void)
     advertising_init();
 
     // Start execution.
+    NRF_LOG_INFO("BLE Beacon started\r\n");
     advertising_start();
 
     // Enter main loop.
     for (;; )
     {
-        power_manage();
+        if (NRF_LOG_PROCESS() == false)
+        {
+            power_manage();
+        }
     }
 }
 

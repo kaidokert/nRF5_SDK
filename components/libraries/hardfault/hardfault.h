@@ -9,10 +9,14 @@
  * the file.
  *
  */
-#ifndef HARFAULT_H__
-#define HARFAULT_H__
+#ifndef HARDFAULT_H__
+#define HARDFAULT_H__
 #include <stdint.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @defgroup hardfault_default HardFault exception
  * @{
@@ -35,7 +39,7 @@ typedef struct HardFault_stack
     uint32_t lr;  ///< Link register.
     uint32_t pc;  ///< Program counter.
     uint32_t psr; ///< Program status register.
-}HardFault_stack_t;
+} HardFault_stack_t;
 
 /**
  * @brief Function for processing HardFault exceptions.
@@ -53,8 +57,12 @@ typedef struct HardFault_stack
  *                In such a situation, the stack pointer is reinitialized to the default position,
  *                and the stack content is lost.
  */
-void HardFault_process(HardFault_stack_t *p_stack);
+void HardFault_process(HardFault_stack_t * p_stack);
 
 /** @} */
-#endif /* HARFAULT_H__ */
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* HARDFAULT_H__ */

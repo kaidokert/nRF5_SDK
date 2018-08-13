@@ -189,8 +189,8 @@ extern BIT dbg_msg;
 
 /* Functions */
 #ifdef __USE_EXCLUSIVE_ACCESS
- #define rt_inc(p)     while(__strex((__ldrex(p)+1),p))
- #define rt_dec(p)     while(__strex((__ldrex(p)-1),p))
+ #define rt_inc(p)     while (__strex((__ldrex(p)+1),p))
+ #define rt_dec(p)     while (__strex((__ldrex(p)-1),p))
 #else
  #define rt_inc(p)     __disable_irq();(*p)++;__enable_irq();
  #define rt_dec(p)     __disable_irq();(*p)--;__enable_irq();
@@ -271,7 +271,7 @@ extern void dbg_task_switch (U32 task_id);
 #define DBG_INIT() dbg_init()
 #define DBG_TASK_NOTIFY(p_tcb,create) if (dbg_msg) dbg_task_notify(p_tcb,create)
 #define DBG_TASK_SWITCH(task_id)      if (dbg_msg && (os_tsk.new!=os_tsk.run)) \
-                                                   dbg_task_switch(task_id)
+                                                   dbg_task_switch (task_id)
 #else
 #define DBG_INIT()
 #define DBG_TASK_NOTIFY(p_tcb,create)

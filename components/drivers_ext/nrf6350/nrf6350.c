@@ -134,9 +134,9 @@ bool nrf6350_lcd_write_string(const char *p_text, uint8_t size, uint8_t line, ui
     {
         if (i == LCD_LLEN)
             break;
-        data_buffer[i+1] = (uint8_t)*p_text++;
+        data_buffer[i + 1] = (uint8_t) * p_text++;
     }
-    return twi_master_transfer(LCD_ADDR << 1, data_buffer, i+1, TWI_ISSUE_STOP);
+    return twi_master_transfer(LCD_ADDR << 1, data_buffer, i + 1, TWI_ISSUE_STOP);
 }
 
 bool  nrf6350_js_get_value(int8_t * val)

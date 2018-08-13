@@ -14,7 +14,8 @@
 *  To maintain compliance with Nordic Semiconductor ASAs Bluetooth profile
 *  qualification listings, this section of source code must not be modified.
 */
-
+#include "sdk_config.h"
+#if BLE_BPS_ENABLED
 #include "ble_bps.h"
 #include <string.h>
 #include "nordic_common.h"
@@ -431,9 +432,16 @@ uint32_t ble_bps_is_indication_enabled(ble_bps_t * p_bps, bool * p_indication_en
     err_code = sd_ble_gatts_value_get(p_bps->conn_handle,
                                       p_bps->meas_handles.cccd_handle,
                                       &gatts_value);
+
     if (err_code == NRF_SUCCESS)
     {
         *p_indication_enabled = ble_srv_is_indication_enabled(cccd_value_buf);
     }
+    if (err_code == BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+    {
+        *p_indication_enabled = false;
+        return NRF_SUCCESS;
+    }
     return err_code;
 }
+#endif //BLE_BPS_ENABLED

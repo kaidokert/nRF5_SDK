@@ -38,6 +38,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Include this file in your project if you want to include in your compiled code files data
  * for the User Information Configuration Registers (UICR) area; see nRF51 Series Reference
@@ -98,5 +102,10 @@ const uint32_t UICR_ADDR_0x80 __attribute__((at(0x10001080))) __attribute__((use
 // const uint32_t UICR_ADDR_0xFC __attribute__((at(0x100010FC))) __attribute__((used)) = 0xFFFFFFFF;
 
 /*lint --flb "Leave library region" */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_UICR_CONFIG_H

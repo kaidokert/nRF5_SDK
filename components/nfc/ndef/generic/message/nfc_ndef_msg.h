@@ -14,6 +14,10 @@
 #define NFC_NDEF_MSG_H__
 
 #include "nfc_ndef_record.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**@file
  *
  * @defgroup nfc_ndef_msg Custom NDEF messages
@@ -38,10 +42,11 @@
   *
   * This function encodes an NDEF message according to the provided message descriptor.
   *
-  * @param[in] p_ndef_msg_desc  Pointer to the message descriptor.
-  * @param[out] p_msg_buffer    Pointer to the message destination.
-  * @param[in,out] p_msg_len    Size of the available memory for the message as input. Size of the generated
-  *                                 message as output.
+  * @param[in]     p_ndef_msg_desc  Pointer to the message descriptor.
+  * @param[out]    p_msg_buffer     Pointer to the message destination. If NULL, function will
+ *                                  calculate the expected size of the message.
+  * @param[in,out] p_msg_len        Size of the available memory for the message as input. Size of
+  *                                 the generated message as output.
   *
   * @return  Return value from @ref nfc_ndef_record_encode.
   */
@@ -144,5 +149,10 @@ ret_code_t nfc_ndef_msg_record_add( nfc_ndef_msg_desc_t    * const p_msg,
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
+
  #endif
 

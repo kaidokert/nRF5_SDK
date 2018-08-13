@@ -28,9 +28,15 @@
     .syntax unified
     .arch armv6-m
 
+#ifdef __STARTUP_CONFIG
+#include "startup_config.h"
+#endif
+
     .section .stack
     .align 3
-#ifdef __STACK_SIZE
+#if defined(__STARTUP_CONFIG)
+    .equ    Stack_Size, __STARTUP_CONFIG_STACK_SIZE
+#elif defined(__STACK_SIZE)
     .equ    Stack_Size, __STACK_SIZE
 #else
     .equ    Stack_Size, 2048
@@ -45,7 +51,9 @@ __StackTop:
 
     .section .heap
     .align 3
-#ifdef __HEAP_SIZE
+#if defined(__STARTUP_CONFIG)
+    .equ Heap_Size, __STARTUP_CONFIG_HEAP_SIZE
+#elif defined(__HEAP_SIZE)
     .equ Heap_Size, __HEAP_SIZE
 #else
     .equ    Heap_Size, 2048

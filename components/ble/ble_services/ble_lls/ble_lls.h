@@ -12,7 +12,7 @@
 
 /** @file
  *
- * @defgroup ble_sdk_srv_lls Link Loss Service
+ * @defgroup ble_lls Link Loss Service
  * @{
  * @ingroup ble_sdk_srv
  * @brief Link Loss Service module.
@@ -42,6 +42,10 @@
 #include <stdint.h>
 #include "ble.h"
 #include "ble_srv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**@brief Link Loss Service event type. */
 typedef enum
@@ -110,6 +114,11 @@ void ble_lls_on_ble_evt(ble_lls_t * p_lls, ble_evt_t * p_ble_evt);
  * @param[out]  p_alert_level  Current Alert Level value.
  */
 uint32_t ble_lls_alert_level_get(ble_lls_t * p_lls, uint8_t * p_alert_level);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_LLS_H__
 

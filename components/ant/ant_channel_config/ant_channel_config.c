@@ -10,6 +10,8 @@
  *
  */
 
+#include "sdk_config.h"
+#if ANT_CHANNEL_CONFIG_ENABLED
 #include "nrf_error.h"
 #include "ant_channel_config.h"
 #include "ant_interface.h"
@@ -54,3 +56,5 @@ uint32_t ant_channel_init(ant_channel_config_t const * p_config)
 
     return err_code;
 }
+
+#endif // ANT_CHANNEL_CONFIG_ENABLED

@@ -17,7 +17,7 @@
 #include "radio_config.h"
 #include "nrf_delay.h"
 
-/* These are set to zero as Shockburst packets don't have corresponding fields. */
+/* These are set to zero as ShockBurst packets don't have corresponding fields. */
 #define PACKET_S1_FIELD_SIZE      (0UL)  /**< Packet S1 field size in bits. */
 #define PACKET_S0_FIELD_SIZE      (0UL)  /**< Packet S0 field size in bits. */
 #define PACKET_LENGTH_FIELD_SIZE  (0UL)  /**< Packet length field size in bits. */
@@ -82,7 +82,7 @@ static uint32_t bytewise_bitswap(uint32_t inp)
 
 
 /**
- * @brief Function for configuring the radio to operate in Shockburst compatible mode.
+ * @brief Function for configuring the radio to operate in ShockBurst compatible mode.
  *
  * To configure the application running on nRF24L series devices:
  *
@@ -146,12 +146,12 @@ void radio_configure()
     if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos))
     {
         NRF_RADIO->CRCINIT = 0xFFFFUL;   // Initial value
-        NRF_RADIO->CRCPOLY = 0x11021UL;  // CRC poly: x^16+x^12^x^5+1
+        NRF_RADIO->CRCPOLY = 0x11021UL;  // CRC poly: x^16 + x^12^x^5 + 1
     }
     else if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_One << RADIO_CRCCNF_LEN_Pos))
     {
         NRF_RADIO->CRCINIT = 0xFFUL;   // Initial value
-        NRF_RADIO->CRCPOLY = 0x107UL;  // CRC poly: x^8+x^2^x^1+1
+        NRF_RADIO->CRCPOLY = 0x107UL;  // CRC poly: x^8 + x^2^x^1 + 1
     }
 }
 

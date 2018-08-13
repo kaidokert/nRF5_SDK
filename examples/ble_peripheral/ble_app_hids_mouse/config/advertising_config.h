@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //#define APP_ADV_INTERVAL_FAST           0x0028   /**< Fast advertising interval (in units of 0.625 ms. This value corresponds to 25 ms.). */
 //#define APP_ADV_INTERVAL_SLOW           0x0C80   /**< Slow advertising interval (in units of 0.625 ms. This value corrsponds to 2 seconds). */
 //
@@ -34,6 +38,11 @@
 //#define APP_ADV_USE_FAST                1
 //#define APP_ADV_USE_SLOW                1
 //#define APP_ADV_USE_WHITELIST           1        /**< Set to True if white list will be used, false if not. */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ADVERTISING_CONFIG_H__
 

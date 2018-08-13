@@ -35,6 +35,10 @@
 #include "sensorsim.h"
 #include "ant_bsc_simulator_local.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**@brief BSC simulator configuration structure. */
 typedef struct
 {
@@ -80,6 +84,11 @@ void ant_bsc_simulator_increment(ant_bsc_simulator_t * p_simulator);
  * @param[in]  p_simulator      Pointer to the simulator instance.
  */
 void ant_bsc_simulator_decrement(ant_bsc_simulator_t * p_simulator);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ANT_BSC_SIMULATOR_H__
 /** @} */

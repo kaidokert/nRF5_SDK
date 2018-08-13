@@ -17,7 +17,7 @@
  *
  * @defgroup ant_sdk_profiles_bpwr_pages Bicycle Power profile pages
  * @{
- * @ingroup ant_sdk_profiles_bpwr
+ * @ingroup ant_bpwr
  * @brief This module implements functions for the BPWR data pages.
  */
 
@@ -28,6 +28,15 @@
 #include "ant_bpwr_common_data.h"   // Instantaneous cadence data.
 #include "ant_common_page_80.h"     // Manufacturer's information data page.
 #include "ant_common_page_81.h"     // Product information data page.
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ANT_BPWR_PAGES_H__
 /** @} */
