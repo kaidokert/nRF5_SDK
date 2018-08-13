@@ -1,3 +1,94 @@
+nRF5 SDK v12.1.0
+----------------
+Release Date: Week 40, 2016
+
+Highlights:
+- Added serialization of the S132 SoftDevice v3.0.0. Serialization of S130 is now deprecated.
+- Included the latest MDK v8.9.0 with a crucial workaround for nRF52832 Errata 108:
+http://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.Rev1.errata/anomaly_832_108.html
+
+The following toolchains/devices have been used for testing and verification:
+- ARM: MDK-ARM version 5.18a
+- GCC: GCC ARM Embedded 4.9 2015q3
+- IAR: IAR Workbench 7.30.4
+
+Supported SoftDevices:
+- S130 v2.0.1
+- S132 v3.0.0
+- S212 v2.0.0
+- S332 v2.0.0
+
+Supported IC revisions:
+- nRF51422/nRF51822 IC revision 3
+- nRF52832 IC revision 1
+
+Supported boards:
+- PCA10028
+- PCA10031
+- PCA10040
+- PCA20006 (only for beacon examples)
+- Dynastream's D52 Starter Kit (only for ANT examples)
+- Arduino Primo v2.1 (board header only)
+For other devices and boards, see the SDK documentation, section "Using the SDK with other boards".
+
+*** New features
+****************
+** Overall **
+- Serialization of the S132 SoftDevice v3.0.
+
+
+*** Changes
+***********
+
+** Overall **
+- Includes the latest Nordic MDK v8.9.0.
+- Small documentation updates.
+
+
+*** Known issues
+****************
+
+** Overall **
+- Updating the MDK requires to manually copy the header and linker files
+  into the SDK folder (ARM Keil uVision 4, IAR Workbench, ARMGCC).
+- When uploading an application to an nRF52 IC using nrfjprog, you must
+  provide the "--reset/-r" argument or powercycle the board.
+
+** BLE **
+- When performing service discoveries after a reconnect,
+  ble_db_discovery might fail to initialize. Refer to this link for a fix:
+  https://devzone.nordicsemi.com/question/92452/nrf52-ble_db_discovery-failed-to-initialize-correctly-when-repeats-the-service-discovery/
+- The "UART/Serial Port Emulation over BLE" (ble_app_uart) example
+  does not compile with nrf_log enabled (missing nrf_log sources)
+- Some examples might have excessively verbose logging.
+- Performing pairing without bonding will cause examples to assert. To
+  fix this, make sure the call to pm_peer_rank_highest() during
+  PM_EVT_CONN_SEC_SUCCEEDED happens only when the procedure is
+  PM_LINK_SECURED_PROCEDURE_BONDING.
+- When an Android device is used as a peripheral, it sends slave
+  security request with the MITM bit set. The central applications in
+  the SDK will reject the security request (Pairing Failed) because
+  they do not support MITM.
+
+** Secure DFU **
+ - nRF Toolbox for iPhone:
+   - When an error occurs, nRF Toolbox does not automatically
+     disconnect. You must therefore reset the board manually to
+     disconnect before you can connect again.
+   - It is not possible to abort a transfer when the device connection
+     is lost.
+   - On resumption, nRF Toolbox does not call execute, which makes it
+     impossible to resume a transfer.
+   - When transferring a combined SoftDevice and bootloader image, the
+     bootloader might not be updated.
+   - On nRF52 devices, the DFU operation is sometimes reported as
+     completed, even though the device is not updated.
+
+** NFC **
+- NFC Type 2 Tag HAL requires using TIMER4 on nRF52832.
+
+------------------------------------------------------------------------
+
 nRF5 SDK v12.0.0
 ----------------
 Release Date: Week 35, 2016
