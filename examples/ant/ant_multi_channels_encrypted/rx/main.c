@@ -66,7 +66,7 @@ static void softdevice_setup(void)
 static void utils_setup(void)
 {
     // Initialize LEDs
-    LEDS_CONFIGURE(LEDS_MASK);
+    bsp_board_leds_init();
 
     // display state of zero count of encrypted channel received.
     ant_se_num_of_decrypted_channels_display();

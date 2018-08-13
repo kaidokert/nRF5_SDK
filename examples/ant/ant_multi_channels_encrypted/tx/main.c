@@ -51,7 +51,7 @@ int main(void)
 {
     uint32_t err_code;
 
-    LEDS_CONFIGURE(LEDS_MASK);
+    bsp_board_leds_init();
 
     softdevice_setup();
 
