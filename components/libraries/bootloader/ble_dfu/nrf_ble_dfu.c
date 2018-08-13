@@ -1,40 +1,12 @@
-/**
- * Copyright (c) 2016 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2016 Nordic Semiconductor. All Rights Reserved.
  *
- * All rights reserved.
+ * The information contained herein is property of Nordic Semiconductor ASA.
+ * Terms and conditions of usage are described in detail in NORDIC
+ * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form, except as embedded into a Nordic
- *    Semiconductor ASA integrated circuit in a product or a software update for
- *    such product, must reproduce the above copyright notice, this list of
- *    conditions and the following disclaimer in the documentation and/or other
- *    materials provided with the distribution.
- *
- * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
- * 4. This software, with or without modification, must only be used with a
- *    Nordic Semiconductor ASA integrated circuit.
- *
- * 5. Any software provided in binary form under this license must not be reverse
- *    engineered, decompiled, modified and/or disassembled.
- *
- * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Licensees are granted free, non-transferable use of the information. NO
+ * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
+ * the file.
  *
  */
 
@@ -87,8 +59,10 @@
 #define MAX_RESPONSE_LEN                    (15)                                                    /**< Maximum length (in bytes) of the response to a Control Point command. */
 
 
-#if (NRF_SD_BLE_API_VERSION == 3)
-#define NRF_BLE_MAX_MTU_SIZE            GATT_MTU_SIZE_DEFAULT                                       /**< MTU size used in the softdevice enabling and to reply to a BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event. */
+#if (NRF_SD_BLE_API_VERSION <= 3)
+    #define NRF_BLE_MAX_MTU_SIZE GATT_MTU_SIZE_DEFAULT                                              /**< MTU size used in the softdevice enabling and to reply to a BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event. */
+#else
+    #define NRF_BLE_MAX_MTU_SIZE BLE_GATT_MTU_SIZE_DEFAULT                                          /**< MTU size used in the softdevice enabling and to reply to a BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event. */
 #endif
 
 
@@ -590,7 +564,7 @@ static void on_write(ble_dfu_t * p_dfu, ble_evt_t * p_ble_evt)
         res_code = nrf_dfu_req_handler_on_req(NULL, &dfu_req, &dfu_res);
         if(res_code != NRF_DFU_RES_CODE_SUCCESS)
         {
-            NRF_LOG_INFO("Failure to run packet write\r\n");
+            NRF_LOG_ERROR("Failure to run packet write\r\n");
         }
 
         // Check if a packet receipt notification is needed to be sent.
@@ -691,7 +665,7 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             on_write(&m_dfu, p_ble_evt);
             break;
 
-#if (NRF_SD_BLE_API_VERSION == 3)
+#if (NRF_SD_BLE_API_VERSION >= 3)
         case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
             err_code = sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle,
                                                        NRF_BLE_MAX_MTU_SIZE);
@@ -738,12 +712,10 @@ static uint32_t gap_address_change(void)
     uint32_t            err_code;
     ble_gap_addr_t      addr;
 
-#ifdef NRF51
+#if (NRF_SD_BLE_API_VERSION < 3)
     err_code = sd_ble_gap_address_get(&addr);
-#elif NRF52
-    err_code = sd_ble_gap_addr_get(&addr);
 #else
-
+    err_code = sd_ble_gap_addr_get(&addr);
 #endif
 
     VERIFY_SUCCESS(err_code);
@@ -751,12 +723,10 @@ static uint32_t gap_address_change(void)
     // Increase the BLE address by one when advertising openly.
     addr.addr[0] += 1;
 
-#ifdef NRF51
+#if (NRF_SD_BLE_API_VERSION < 3)
     err_code = sd_ble_gap_address_set(BLE_GAP_ADDR_CYCLE_MODE_NONE, &addr);
-#elif NRF52
-    err_code = sd_ble_gap_addr_set(&addr);
 #else
-
+    err_code = sd_ble_gap_addr_set(&addr);
 #endif
 
     VERIFY_SUCCESS(err_code);
@@ -779,12 +749,15 @@ static uint32_t gap_params_init(void)
 
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
 
+    // This seems to not be implemented on Graviton
     err_code = gap_address_change();
     VERIFY_SUCCESS(err_code);
 
     err_code = sd_ble_gap_device_name_set(&sec_mode,
                                           (const uint8_t *)DEVICE_NAME,
                                           strlen(DEVICE_NAME));
+
+
     VERIFY_SUCCESS(err_code);
 
     gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
@@ -811,20 +784,37 @@ static uint32_t ble_stack_init(bool init_softdevice)
     NRF_LOG_INFO("vector table: 0x%08x\r\n", BOOTLOADER_START_ADDR);
     err_code = sd_softdevice_vector_table_base_set(BOOTLOADER_START_ADDR);
     VERIFY_SUCCESS(err_code);
+    NRF_LOG_INFO("vector table: 0x%08x\r\n", BOOTLOADER_START_ADDR);
 
+    NRF_LOG_INFO("Error code - sd_softdevice_vector_table_base_set: 0x%08x\r\n", err_code);
+    //err_code = sd_softdevice_vector_table_base_set(BOOTLOADER_START_ADDR);
+
+    NRF_LOG_INFO("Before SOFTDEVICE_HANDLER_APPSH_INIT\r\n");
     SOFTDEVICE_HANDLER_APPSH_INIT(&clock_lf_cfg, true);
+    NRF_LOG_INFO("After SOFTDEVICE_HANDLER_APPSH_INIT\r\n");
 
     ble_enable_params_t ble_enable_params;
     // Only one connection as a central is used when performing dfu.
     err_code = softdevice_enable_get_default_config(1, 1, &ble_enable_params);
+    NRF_LOG_INFO("Error code - softdevice_enable_get_default_config: 0x%08x\r\n", err_code);
     VERIFY_SUCCESS(err_code);
 
-#if (NRF_SD_BLE_API_VERSION == 3)
+#if (NRF_SD_BLE_API_VERSION >= 3)
     ble_enable_params.gatt_enable_params.att_mtu = NRF_BLE_MAX_MTU_SIZE;
 #endif
 
+    NRF_LOG_INFO("Enabling softdevice.\r\n");
     // Enable BLE stack.
     err_code = softdevice_enable(&ble_enable_params);
+    if (err_code != NRF_SUCCESS)
+    {
+        NRF_LOG_ERROR("Failed softdevice_enable: 0x%08x\r\n", err_code);
+    }
+    else
+    {
+        NRF_LOG_INFO("Softdevice enabled\r\n");
+    }
+
     return err_code;
 }
 
