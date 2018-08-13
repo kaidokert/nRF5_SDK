@@ -1,3 +1,478 @@
+nRF5 SDK v14.1.0
+------------------------
+Release Date: Week 42, 2017
+
+Highlights:
+
+- Integrated nRF5 IoT SDK into nRF5 SDK. Subsequent updates of IoT components will be available through nRF5 SDK.
+  This release marks IoT SDK v1.0.0. The IoT SDK is no longer prototype.
+- Added Segger Embedded Studio (SES) IDE support.
+- The new SoC nRF52810 supported for the BLE examples using the new S112 SoftDevice and for a few peripheral examples.
+  Examples targeting this new device are located in the 'PCA10040E' folder.
+  For more details, see 'Developing for nRF52810' in the SDK documentation.
+- Support for the new S112 SoftDevice.
+  Added new S112 target for most of the Bluetooth Peripheral examples.
+- The NFC library includes an API change that may need extra attention. See Changes -> NFC BLE Pairing Library.
+
+The following toolchains/devices have been used for testing and
+verification:
+- SES: SES 3.30
+- ARM: MDK-ARM version 5.18a
+- GCC: GCC ARM Embedded 4.9 2015q3
+- IAR: IAR Workbench 7.80.4
+- Linux: Ubuntu 17.04, Kernel 4.10.0. (for the 6LoWPAN Border Router)
+- J-link: 6.20d
+
+Supported SoftDevices:
+- S112 v5.1.0-2.alpha
+- S132 v5.0.x
+- S140 v5.0.0-2.alpha
+- S212 v5.0.x
+- S332 v5.0.x
+
+Supported boards:
+- PCA10040E (nRF52810 emulation on PCA10040)
+- PCA10040
+- PCA10056 (limited support; see the "Scope for the nRF52840 chip" section)
+- Dynastream's D52DK1 (only for ANT examples)
+
+For other devices and boards, see the SDK documentation, section "Using
+the SDK with other boards".
+
+
+*** Scope for the nRF52840 chip
+********************************
+All examples and libraries for the new chip must be treated as
+experimental.
+Some examples have not been ported to run on nRF52840. Check the
+existing example projects to see which targets are supported.
+
+The following SDK features are supported on the new nRF52840 chip:
+   - IEEE 802.15.4 stack library with an example
+   - Most BLE, hardware peripheral, and NFC examples (with some
+     exceptions; see the available example projects for details)
+   - Peripheral HAL and drivers (both for existing and new peripherals)
+   - Cryptography library including CryptoCell CC310 backend
+   - NFC Type 2 Tag and Type 4 Tag
+   - Secure DFU (only with micro-ecc backend)
+   - DTM including support for the new Bluetooth 5 features
+   - Gazell
+
+The following SDK features are not supported on the new nRF52840 chip:
+   - ANT
+   - Eddystone
+   - ESB
+   - FreeRTOS
+   - IoT components
+   - Serialization of the S140 SoftDevice v5.0.0-2.alpha
+
+*** New features
+*****************
+
+** Common **
+ - Added support for the new chip nRF52810.
+ - New example flash_fstorage added to examples\peripheral\flash_fstorage.
+   This example shows how to use the nrf_fstorage library.
+ - New example flash_fds added to examples\peripheral\flash_fds.
+   This example shows how to use the FDS library.
+ - Added support in Segger Embedded Studio and armgcc for editing the sdk_config.h file in the external graphical editor (CMSIS Configuration Wizard).
+
+** BLE **
+ - Bluetooth Peripheral examples now support the S112 SoftDevice.
+   S112 is designed to work with the new SoC nRF52810. Examples targeting this new device are located in folder 'PCA10040E'.
+   See SDK documentation for more details.
+
+ - Added support for IPSP (Internet Protocol Support Profile).
+  IPSP is now based on production-quality SoftDevice S132 v5.0.0. The IPSP is, also, a qualified profile.
+  The IPSP service uses L2CAP Connection Oriented Channels to transfer data between devices.
+    - The profile implementation added to components\ble\ble_services.
+    - The IPSP Acceptor example added to examples\ble_peripheral\ble_app_ipsp_acceptor.
+    - The IPSP Initiator example added to examples\ble_central\ble_app_ipsp_initiator.
+
+ - Added all IoT components, including BLE 6LoWPAN, Nordic's IPv6 Stack, CoAP, MQTT, DFU over TFTP, lwIP port on nRF platform, and others.
+    - Changes in these components in comparison to IoT SDK v0.9.0 are described in the Changes section of the release notes.
+
+ - The SDK now supports firmware upgrade over TFTP (IPv6).
+    - This mechanism for updating the firmware was earlier available in the IoT SDK, and is now a part of the nRF SDK.
+
+ - New example app_ble_gatts added to examples\ble_central\experimental\ble_app_gatts.
+   This application can be used to test the Service Changed indications together with app_ble_gatts_c.
+
+ - Added S332 projects in Heart Rate Sensor and Heart Rate Collector examples.
+
+** ANT **
+ - Added support for the new SoftDevices: S212 v5.0.x and S332 v5.0.x.
+ - Added S332 examples: 'Ant Shared Channels' and 'ANT and BLE Heart Rate Monitor Relay Application'.
+ - Added S332 projects in ANT Message Types and ANT Bootloader examples.
+
+** NFC **
+ - Dynamic NFCID1 configuration in Type 2 and Type 4 Tag libraries.
+
+** USB (Experimental) **
+NOTE: The USB implementation is currently experimental and work in progress. Because of this, the code base and APIs
+will change in-between SDK versions and will not necessarily be backwards compatible. This also applies to minor and
+bugfix versions. Migration notes might not be complete for these changes.
+ - nrf_drv_usbd:
+    - New API function nrf_drv_usbd_ep_dtoggle_clear() implemented.
+ - app_usbd:
+    - Added a new function app_usbd_sof_timestamp_get() and its configuration APP_USBD_PROVIDE_SOF_TIMESTAMP.
+      This function may be used to stamp the timing of the logger messages.
+    - Interface selection mechanism provided.
+      Currently, every class that contains alternate interface settings requires the class methods
+      iface_select, iface_deselect, and iface_selection_get to be implemented.
+      No action is required if only the classes provided in the SDK are used.
+    - New event implemented:
+      APP_USBD_EVT_STATE_CHANGED – called when the state of USB interface is updated.
+
+** DTM **
+ - Added support for the new SoC nRF52810.
+
+** Serialization **
+ - Added solution for serialization of the combined BLE and ANT SoftDevice, using the ble_ant_app_hrm example as the use case.
+ - Added BLE connectivity (S132) support for nRF52810 (emulated on PCA10040).
+
+** Drivers and libraries **
+ - Added examples: UART and SAADC for nRF52810.
+  Examples targeting this new chip are located in the 'PCA10040E' folder. See SDK documentation for more details.
+ - Added the sorted list module (nrf_sortlist).
+
+** IOT **
+ - Added experimental examples under the "examples\iot" folder and libraries in the "components\iot" folder.
+  They show the usage of IPv6 over Bluetooth low energy using IPSP and 6LoWPAN. The demonstrated protocols include:
+    - BSD Sockets,
+    - UDP and TCP,
+    - DTLS and TLS,
+    - CoAP and Secure CoAP,
+    - MQTT and Secure MQTT,
+    - TFTP and LWM2M,
+    - Device Firmware Upgrade (DFU) over TFTP,
+    - DNS, ICMP, and SNTP.
+
+
+*** Changes
+************
+
+** BLE **
+ - BLE event handler priorities have changed (BLE_OBSERVER_PRIO).
+    - The order of some module BLE event handlers has been changed. This means that compiling
+      new sdk_config.h files with old modules might lead to crashes.
+    - A new priority has been added, and all BLE applications have been changed to have
+      the new priority (NRF_SDH_BLE_OBSERVER_PRIO_LEVELS has been changed from 3 to 4).
+      This means that compiling new main files with old sdk_config.h files will not work
+      unless NRF_SDH_BLE_OBSERVER_PRIO_LEVELS is set to 4 or more.
+ - Peer Manager
+    - Added a new event PM_EVT_CONN_SEC_PARAMS_REQ and a new function pm_conn_sec_params_reply()
+      to allow setting security parameters for individual security procedures. Calling
+      pm_conn_sec_params_reply() is optional.
+    - Added a new configuration parameter PM_CENTRAL_ENABLED which removes the pairing functionality
+      for the central role when turned off, saving code size.
+    - Added a new informational event PM_EVT_SLAVE_SECURITY_REQ. No further Peer Manager action is
+      expected from the user in response to this event.
+    - Added a new event PM_EVT_FLASH_GARBAGE_COLLECTED which indicates that garbage collection has happened
+      in the flash storage, possibly freeing up space for new bonds.
+    - Added new function pm_address_resolve() for resolving BLE addresses.
+ - NFC BLE Pairing Library
+    - Added library support for the PM_EVT_CONN_SEC_PARAMS_REQ event from the Peer Manager.
+      NOTE:
+    ----------------------------------------
+    After the change in Peer Manager priority, this change in API was necessary to properly support all pairing modes.
+    Action: Call the nfc_ble_pair_on_pm_params_req() function inside the Peer Manager event handler in response to the
+    PM_EVT_CONN_SEC_PARAMS_REQ event:
+       case PM_EVT_CONN_SEC_PARAMS_REQ:
+       {
+          // Send event to the NFC BLE pairing library as it may dynamically alternate
+          // security parameters to achieve highest possible security level.
+          err_code = nfc_ble_pair_on_pm_params_req(p_evt);
+          APP_ERROR_CHECK(err_code);
+       } break;
+    ------------------------------------------
+ - The Heart Rate Application with BLE Pairing Using NFC Pairing Library now requires LESC
+   pairing to enable Heart Rate notifications.
+ - The LESC example now generates the DH key in the main thread so as not to hold up the
+   SoftDevice's BLE event queue.
+
+** BLE IoT **
+ - Changes from the previous IoT SDK v0.9.0 release:
+    - The 6LoWPAN library has been rewritten to adopt the new S132 v5.0.0 SoftDevice providing L2CAP Connection Oriented Channels feature.
+      The library is now distributed in source code format and not as a precompiled library.
+    - API breakers in many of the components including BLE IPSP, BLE 6LoWPAN, MQTT, nRF lwIP driver port, and background DFU.
+    - Deprecated the cloud examples. Cloud services used in them were not suitable any more.
+      The protocol features required to connect to a cloud are included and supported.
+    - lwIP external component has been updated to version 2.0.2.
+    - mbedTLS external component has been updated to version 2.4.2.
+
+** NFC **
+ - Removed the SoftDevice from the Writable NDEF Message example.
+   This example no longer requires the SoftDevice.
+ - All NFC libraries now have static configuration in the sdk_config.h file.
+
+** USB (experimental) **
+ - nrf_drv_usbd:
+    - Endpoint transfers are no longer aborted inside the USB RESET handler,
+      any transfer is now aborted when an endpoint is disabled.
+    - The nrf_drv_usbd_transfer_out_drop() function now does not start any dummy transfer –  the endpoint is cleared by
+      writing correct values to SIZE.EPOUT registers or backdoor interface for the sample chip.
+    - Transfer can be started on a stalled endpoint.
+      In the previous version, NRF_ERROR_FORBIDDEN error was returned.
+      However, the possibility to stall the endpoint and prepare the answer that will be sent
+      after the stall is cleared by the HOST appeared to be widely used in MSC.
+    - Function rename: usbd_drv_ep_abort -> nrf_drv_usbd_ep_abort.
+ - app_usbd:
+    - All endpoints but 0 are disabled when the device is not configured.
+      This matches USB requirements.
+    - Function app_usbd_active_check provided – this allows to check whether
+      there is any active USB traffic or interface is suspended.
+      The macros APP_USB_STATE_BASE and APP_USBD_STATE_SUSPENDED_MASK removed.
+      The app_usbd_state_t enumeration now provides no information about suspended states.
+      Use app_usbd_active_check function whenever the SUSPEND state was checked via app_usbd_core_state_get function.
+    - The SETUP event processing cleaned up, normalized, and documented.
+      Clear rules for the order in which a class and default handlers are called.
+    - Functions app_usbd_core_ep_(handled_)transfer() and app_usbd_core_setup_data_(handled_)transfer()
+      unified and replaced by app_usbd_ep_(handled_)transfer functions:
+          app_usbd_core_ep_transfer()                 -> app_usbd_ep_transfer()
+          app_usbd_core_ep_handled_transfer()         -> app_usbd_ep_handled_transfer()
+          app_usbd_core_setup_data_transfer()         -> app_usbd_ep_transfer()
+          app_usbd_core_setup_data_handled_transfer() -> app_usbd_ep_handled_transfer()
+  - Classes implementation:
+    - Audio class implementation aligned to use the new alternate interface selection functionality.
+    - MSC class implementation error handling totally rebuilt to match the specification.
+      Now, it is stable and passes all USB precertification tests (with one small warning to be corrected in the future).
+
+** Crypto **
+ - Infineon Optiga Trust E communication library and authentication example are now in production quality.
+
+** Drivers and libraries **
+ - Command Line Interface (CLI) library is now in production quality.
+ - Logger (nrf_log) can process logs after panic mode.
+ - app_twi modules renamed to nrf_twi_mngr. Translation layer (app_twi.h) kept for backward compatibility.
+
+
+*** Bugfixes
+****************
+
+** BLE **
+ - Peer Manager:
+    - Fixed a bug where a bonded and encrypted link could have invalid peer ID when the
+      Central uses a random non-resolvable address.
+    - Fixed a bug where the Service Changed state was always reported as "true" when
+      changed.
+    - Fixed a bug where peer rank was not written during pm_peer_rank_highest() if the
+      highest ranked peer was deleted and the peer ID was reused, or if the peer rank
+      value was manually changed or deleted.
+    - Fixed a bug where pm_conn_sec_status() would incorrectly return false for bonded field when
+      called during the PM_EVT_CONN_SEC_SUCCEEDED event for a reconnected bonded peer.
+    - Fixed a bug where pm_conn_secure() would return an undocumented error code if called
+      multiple times before the first procedure has completed.
+    - Fixed the ordering of events from pm_peers_delete(). The PM_EVT_PEERS_DELETE_SUCCEEDED
+      will now arrive after all PM_EVT_PEER_DELETE_SUCCEEDED events.
+ - Fixed a bug in ble_app_queued_writes where the characteristic would use the BLE UUID type
+   instead of a vendor type.
+ - Fixed a bug in ble_app_gls where the connection handle would be unassigned before the
+   disconnect call is issued (The connection handle is needed for the disconnect call).
+ - Fixed a bug in ble_app_gls where the Record Access Control Point indications would not be retried if an indication procedure was already in progress.
+ - Fixed a bug in ble_app_ancs_c where a missing C++ guard prevented it from compiling
+   correctly using C++.
+ - Fixed the LESC example so that it properly handles simultaneous security operations on both
+   links (numeric match and DHKEY generation).
+ - Fixed a bug in ble_app_ias_c where receiving a "Mild Alert" would print "No Alert" on the log, and "No Alert" would print "Mild Alert".
+ - Fixed a bug in ble_app_cgms where the connection handle would be set to invalid before calling sd_ble_gap_disconnect(). This would cause the call to fail and the app would assert.
+ - Fixed a bug in ble_app_hids_keyboard and ble_app_hids_mouse where the battery reading done before the connection was secured could cause the app to assert.
+ - Fixed a bug in ble_app_multirole_lesc where it would not handle PHY update requests.
+ - Fixed a bug that could prevent FDS from working properly when using the new nrf_fstorage_nvmc backend.
+ - Fixed a bug that could prevent FDS from working properly when using the nrf_fstorage_sd backend with the SoftDevice disabled.
+ - Keil will no longer delete the SoftDevice HEX file if the flash_softdevice target is compiled.
+
+** Crypto **
+ - Enforced the alignment on nrf_crypto buffers for signature types.
+ - Removed an unused file (nrf_crypto.c) that would cause compilation errors for some users.
+
+** DFU **
+ - Added a workaround for updating SoftDevices with changed size (from SDK 12.x.y -> 14.1.x). See configuration parameter NRF_DFU_WORKAROUND_PRE_SDK_14_1_0_SD_BL_UPDATE.
+
+** NFC **
+ - Type 4 Tag HAL:
+    - Handling of erroneous NFC-A data frames (with parity and CRC errors) has been
+      improved.
+
+** USB (Experimental) **
+ - HAL:
+     - Function nrf_usbd_dtoggle_set() is fixed. The previous version was not functional.
+       It was working in the examples thanks to the fact that nrf_usbd_dtoggle_get()
+       function was called before every nrf_usbd_dtoggle_set().
+
+** Drivers and libraries **
+ - Fixed a bug where SPI MISO was missing a pulldown.
+    Currently, the pulldown status can be configured with the SDK configuration parameter: NRF_SPI_DRV_MISO_PULLUP_CFG.
+ - Fixed a bug where the length parameters passed to macro NRF_LOG_HEXDUMP_DEBUG were not calculated correctly.
+ - Fixed a bug where a user could receive a "wrong configuration" error during the compilation of SPI driver.
+ - Fixed a bug where extern "C" was not terminated correctly in the Logger module.
+ - Fixed a bug in the PPI example where Timer 2 was not generating a CC event every odd second.
+ - Fixed the header guard in the ble_l2cap_conn.h file.
+ - Fixed a bug where nrf_log could crash when heavily loaded.
+ - Fixed the pwm_library example which was not working correcly when compiled with highest optimization on IAR.
+
+** Serialization **
+ - Fixed encoding of ble_gap_data_length_params_t and ble_gap_data_length_limitation_t structures.
+ - Fixed encoding of ble_gap_evt_auth_status_t::lesc.
+ - Fixed serialization of GATT MTU value
+   (https://devzone.nordicsemi.com/question/165596/scanner-doesnt-work-on-nrf52832sdk-14/)
+ - Fixed improper configuration of scheduler event size in serialized examples
+   (https://devzone.nordicsemi.com/question/166657/serialization-for-s132-5x-triggers-buffer-overflow-in-event-scheduling/)
+
+
+*** Known Issues
+****************
+
+** BLE **
+ - When working on the emulated nRF52810 target, if you change the optimization level and/or add the logging functionality, the project might not compile or fail at runtime due to not enough flash available for FDS or Peer Manager.
+ - All Bluetooth applications not using the nrf_queued_write module will assert when a peer sends a Write request with the opcode 'cancel all operations' (BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL), after the SoftDevice call to sd_ble_gatts_rw_authorize_reply. This SoftDevice call, for the opcode 'cancel all operations', returns NRF_INVALID_PARAMS if the gatt_status is not BLE_GATT_STATUS_SUCCESS.
+
+** BLE IOT **
+ - Neighbor discovery module for lwIP requires the on-link flag in the router advertisement to be set in order to create a SLAAC address from the prefix. However, RFC 7668 (https://tools.ietf.org/html/rfc7668) requires this bit to be zero. Therefore, the nd6.c from lwIP source has been modified to relax this check.
+ - There are some issues when using the IoT examples against Linux Kernel 4.12+ which causes the kernel to only work with one 6LoWPAN connection. If more than one kit is connected using 6LoWPAN, none of the nodes will be accessible.
+ - Scheduler has been included in most IoT examples to avoid race conditions found when using lwIP stack, more precisely the TCP examples.
+   The issue was that the TCP client stopped working after about 15 hours. However, when using mbedTLS, the use of scheduler is not possible.
+   Therefore, the MQTT client examples might be affected by this issue.
+ - The use of security, both with TLS and DTLS, should be treated as experimental.
+ - MQTT examples cannot be used with commissioning. There is not enough RAM to accommodate both TLS and the commissioning service.
+
+** NFC **
+ - NFC Type 2 and Type 4 Tag HAL modules require using TIMER 4 on nRF52832.
+ - Some mobile phone apps cannot write Type 4 Tag ("NFC Tools" and "TagWriter" v4.1
+   seem to be okay to use).
+
+** USB (experimental) **
+ - MSC implementation does not stall when the host requires more bytes than are available in the selected descriptor. It is not a problem for any tested driver on Windows and Linux, but still violates the specification.
+ - During high USB traffic, in rare cases, communication might hang or the endpoint data might be transferred twice. See PAN 104.
+
+** Drivers and libraries **
+  - SAADC driver is not handling detection limits 'high' and 'low' correctly if SAADC resolution is greater than 10 bits.
+
+
+========================================================================
+
+nRF5 SDK v14.1.0-1.alpha
+------------------------
+Release Date: Week 32, 2017
+
+Highlights:
+- Integrated what was previously known as nRF5 IoT SDK into nRF5 SDK. Subsequent updates of IoT components will be available through nRF5 SDK.
+- Migrated IoT components to use L2CAP Connection Oriented Channels feature of S132 v5.0.0.
+
+The following toolchains/devices have been used for testing and
+verification:
+- ARM: MDK-ARM version 5.18a
+- GCC: GCC ARM Embedded 4.9 2015q3
+- IAR: IAR Workbench 7.80.4
+- Linux: Ubuntu 17.04, Kernel 4.10.0.
+
+Supported SoftDevices:
+- S132 v5.0.x
+- S140 v5.0.0-2.alpha
+- S212 v4.0.x
+
+Supported boards:
+- PCA10040
+- PCA10056 (limited support; see the "Scope for the nRF52840 chip" section)
+- Dynastream's D52DK1 (only for ANT examples)
+
+For other devices and boards, see the SDK documentation, section "Using
+the SDK with other boards".
+
+
+*** Scope for the nRF52840 chip
+********************************
+All examples and libraries for the new chip must be treated as
+experimental.
+Some examples have not been ported to run on nRF52840. Check the
+existing example projects to see which targets are supported.
+
+The following SDK features are supported on the new nRF52840 chip:
+  - IEEE 802.15.4 stack library with an example
+  - Most BLE, hardware peripheral, and NFC examples (with some
+    exceptions; see the available example projects for details)
+  - Peripheral HAL and drivers (both for existing and new peripherals)
+  - Cryptography library including CryptoCell CC310 backend
+  - NFC Type 2 Tag and Type 4 Tag
+  - Secure DFU (only with micro-ecc backend)
+  - DTM including support for the new Bluetooth 5 features
+
+The following SDK features are not supported on the new nRF52840 chip:
+   - ANT
+   - ESB and Gazell
+   - FreeRTOS
+   - Eddystone
+   - Serialization of the S140 SoftDevice v5.0.0-2.alpha
+
+
+*** New features
+*****************
+
+** BLE **
+ - Added support for IPSP (Internet Protocol Support Profile). The IPSP service uses L2CAP Connection Oriented Channels to transfer data between devices.
+     - Implementation added to components\ble\ble_services.
+     - IPSP Acceptor example added to examples\ble_peripheral\ble_app_ipsp_acceptor.
+     - IPSP Initiator example added to examples\ble_central\ble_app_ipsp_initiator.
+
+** Drivers and libraries **
+ - Added experimental examples under the "examples\iot" folder and libraries in the "components\iot" folder that show the usage of IPv6 over Bluetooth Smart using IPSP and 6LoWPAN. The demonstrated protocols include:
+     - BSD Sockets,
+     - UDP and TCP,
+     - DTLS and TLS,
+     - CoAP and Secure CoAP,
+     - MQTT and Secure MQTT,
+     - TFTP and LWM2M,
+     - Device Firmware Upgrade (DFU) over TFTP,
+     - DNS, ICMP, and SNTP.
+
+*** Changes
+************
+
+** BLE IOT **
+ - Changes from the previous nRF5 IoT SDK 0.9.0 release
+    - The 6LoWPAN library has been rewritten to adopt the new S132 v5.0.0 SoftDevice providing L2CAP Connection Oriented Channels. The library is now distributed in source code format and not as a precompiled library.
+    - LWIP external component has been updated to version 2.0.2.
+    - mbedTLS external component has been updated to version 2.4.2.
+
+*** Known Issues
+****************
+
+** Overall **
+ - In the UART peripheral example, only a line feed (LF) is output on startup and when resetting the board.
+ - Serialized Direct Test Mode does not report RX packet count correctly.
+
+** BLE **
+ - It is possible that the Peer Manager may return corrupt data when attempting to read the GATT attributes table under some circumstances when FDS CRC checks are enabled.
+ - In the Multiperipheral Example, LED 3 will toggle when writing any non-zero value to it. Also, two notifications instead of one are received on the Button Characteristic (0x1524) when pressing Button 1.
+ - For all serialized applications, the MTU size (NRF_SDH_BLE_GATT_MAX_MTU_SIZE in sdk_config.h) should be kept at the default level. Changing this value makes the application non-functional as the connectivity application uses static size buffers.
+ - Eddystone Beacon Application - LED indication might differ from what is described in documentation under the Testing section.
+
+** BLE IOT **
+ - Neighbor discovery module for lwIP requires the on-link flag in the router advertisement to be set in order to create a SLAAC address from the prefix. However, RFC 7668 (https://tools.ietf.org/html/rfc7668) requires this bit to be zero. Therefore, the nd6.c from lwIP source has been modified to relax this check.
+ - There are some issues using the IoT examples against Linux Kernel 4.12+ which causes the kernel to only work with one 6LoWPAN connection. If more than one kit is connected using 6LoWPAN, none of the nodes will be accessible.
+
+** ANT **
+- Most ANT examples do not have the nrf_log backend in the project files, so enabling logging does not have any effect.
+
+** NFC **
+ - NFC Type 2 and Type 4 Tag HAL modules require using TIMER4 on nRF52832.
+ - Some mobile phone apps cannot write Type 4 Tag (the "NFC Tools" app seems to
+   be okay to use).
+ - BLE peripheral examples with NFC pairing work as expected only with Android 7.1.2.
+
+** DFU **
+ - Downgrading from nRF5 SDK v14.0.0 to nRF5 SDK v13.0.0 has been observed to cause the v13.0.0 bootloader to corrupt itself (Upgrading works as expected).
+ - The S140 SoftDevice currently does not support updating of the bootloader.
+ - The CTX pin (P0.07) should be grounded to run the Serial Secure DFU on both nRF52832 and nRF52840 boards.
+ - BLE/Serial Secure DFU only supports nrfutil 2.3.0.
+ - For nRF52840, a combined SoftDevice and application update on Serial transport fails when using nrfutil 2.3.0. Running a single SoftDevice and application update sequentially works as expected.
+
+ ** USB **
+ - USB driver Anomaly 104 solution is very unstable in IAR compilation with high optimization level.
+
+
+========================================================================
+
 nRF5 SDK v14.0.0
 ------------------------
 Release Date: Week 31, 2017
