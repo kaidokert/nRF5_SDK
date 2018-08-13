@@ -136,7 +136,7 @@ ret_code_t es_adv_timing_resolve(es_adv_timing_resolver_input_t * p_input)
 
     p_input->p_result->len_timing_results = result_index; // Note: index has been increased to equal length of result.
 
-    if(p_input->p_result->len_timing_results > 0)
+    if (p_input->p_result->len_timing_results > 0)
     {
         p_input->p_result->timing_results[p_input->p_result->len_timing_results - 1].delay_ms = 0; // Last Slot does not need delay.
     }
