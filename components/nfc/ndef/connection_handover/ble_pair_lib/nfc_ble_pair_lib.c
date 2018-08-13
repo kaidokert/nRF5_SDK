@@ -1,12 +1,40 @@
-/* Copyright (c) 2016 Nordic Semiconductor. All Rights Reserved.
+/**
+ * Copyright (c) 2016 - 2017, Nordic Semiconductor ASA
  *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
+ * All rights reserved.
  *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
@@ -74,6 +102,7 @@ static bool     m_pending_advertise = false;                         /**< Flag u
 __ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_pk;                  /**< LESC ECC Public Key */
 __ALIGN(4) static ble_gap_lesc_p256_sk_t m_lesc_sk;                  /**< LESC ECC Secret Key */
 __ALIGN(4) static ble_gap_lesc_dhkey_t   m_lesc_dhkey;               /**< LESC ECC DH Key */
+__ALIGN(4) static ble_gap_lesc_p256_pk_t m_lesc_peer_pk;             /**< LESC Peer ECC Public Key */
 
 /**
  * @brief Generates random values to a given buffer
@@ -112,7 +141,7 @@ static void random_vector_log(uint8_t length)
 }
 
 /**
- * @brief Function handling NFC events
+ * @brief Function for handling NFC events.
  *
  * @details Starts advertising and generates new OOB keys on the NFC_T2T_EVENT_FIELD_ON event.
  *
@@ -179,9 +208,9 @@ static void nfc_callback(void          * p_context,
 }
 
 /**
- * @brief Function for setting Peer Manager secure mode used in device pairing
+ * @brief Function for setting the Peer Manager secure mode used in device pairing.
  *
- * @param[in] mode                  NFC pairing mode, this is value of the @ref nfc_pairing_mode_t enum
+ * @param[in] mode                  NFC pairing mode, this is the value of @ref nfc_pairing_mode_t enum
  *
  * @retval NRF_SUCCESS              If new secure mode has been set correctly.
  * @retval NRF_ERROR_INVALID_PARAM  If pairing mode is invalid.
@@ -216,8 +245,8 @@ static ret_code_t pm_secure_mode_set(nfc_pairing_mode_t mode)
 
         case NFC_PAIRING_MODE_LESC_OOB:
         case NFC_PAIRING_MODE_LESC_JUST_WORKS:
-            // Enable LESC pairing - OOB and MITM flags are cleared because it is central device
-            // who decides if connection will be authorized with LESC OOB data.
+            // Enable LESC pairing - OOB and MITM flags are cleared because it is the central device
+            // who decides if the connection will be authorized with LESC OOB data.
             sec_param.mitm  = 0;
             sec_param.oob   = 0;
             sec_param.lesc  = 1;
@@ -259,7 +288,7 @@ static ret_code_t pm_secure_mode_set(nfc_pairing_mode_t mode)
  *
  * @details This function does not stop and start the NFC tag data emulation.
  *
- * @param[in] mode Pairing mode for which tag data should be prepared.
+ * @param[in] mode Pairing mode for which the tag data will be prepared.
  *
  * @retval NRF_SUCCESS              If new tag pairing data has been set correctly.
  * @retval NRF_ERROR_INVALID_PARAM  If pairing mode is invalid.
@@ -471,7 +500,7 @@ void on_nfc_ble_pair_evt(const ble_evt_t * const p_ble_evt)
 
     switch (p_ble_evt->header.evt_id)
     {
-        // Upon authorization key request, reply with Temporary Key readen from the NFC tag
+        // Upon authorization key request, reply with Temporary Key that was read from the NFC tag
         case BLE_GAP_EVT_AUTH_KEY_REQUEST:
             NRF_LOG_DEBUG("BLE_GAP_EVT_AUTH_KEY_REQUEST\r\n");
 
@@ -494,11 +523,15 @@ void on_nfc_ble_pair_evt(const ble_evt_t * const p_ble_evt)
                 APP_ERROR_CHECK(err_code);
             }
 
+            // Buffer peer Public Key because ECC module arguments must be word aligned
+            memcpy(&m_lesc_peer_pk.pk[0],
+                   &p_ble_evt->evt.gap_evt.params.lesc_dhkey_request.p_pk_peer->pk[0],
+                   BLE_GAP_LESC_P256_PK_LEN);
+
             // Compute D-H key
-            err_code = ecc_p256_shared_secret_compute(
-                            &m_lesc_sk.sk[0],
-                            &p_ble_evt->evt.gap_evt.params.lesc_dhkey_request.p_pk_peer->pk[0],
-                            &m_lesc_dhkey.key[0]);
+            err_code = ecc_p256_shared_secret_compute(&m_lesc_sk.sk[0],
+                                                      &m_lesc_peer_pk.pk[0],
+                                                      &m_lesc_dhkey.key[0]);
             APP_ERROR_CHECK(err_code);
 
             // Reply with obtained result
@@ -550,7 +583,7 @@ void on_nfc_ble_pair_evt(const ble_evt_t * const p_ble_evt)
             }
             else
             {
-                // Generate new LESC key pair and OOB data only when connection is not terminated because of new tag reading
+                // Generate new LESC key pair and OOB data only when connection is not terminated because of reading a new tag
                 if ((m_pairing_mode == NFC_PAIRING_MODE_LESC_OOB) ||
                     (m_pairing_mode == NFC_PAIRING_MODE_LESC_JUST_WORKS))
                 {

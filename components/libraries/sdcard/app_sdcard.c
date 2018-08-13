@@ -1,15 +1,42 @@
-/* Copyright (c) 2016 Nordic Semiconductor. All Rights Reserved.
+/**
+ * Copyright (c) 2016 - 2017, Nordic Semiconductor ASA
  *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
+ * All rights reserved.
  *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 #include "sdk_config.h"
 #if APP_SDCARD_ENABLED
 
@@ -41,8 +68,8 @@
 #define CMD55   (CMD_MASK | 55)                 /**< SDC/MMC command 55: APP_CMD. */
 #define CMD58   (CMD_MASK | 58)                 /**< SDC/MMC command 58: READ_OCR. */
 #define ACMD13  (ACMD_MASK | CMD_MASK | 13)     /**< SDC application command 13: SD_STATUS. */
-#define	ACMD23  (ACMD_MASK | CMD_MASK | 23)     /**< SDC application command 23: SET_WR_BLK_ERASE_COUNT. */
-#define	ACMD41  (ACMD_MASK | CMD_MASK | 41)     /**< SDC application command 41: SEND_OP_COND. */
+#define ACMD23  (ACMD_MASK | CMD_MASK | 23)     /**< SDC application command 23: SET_WR_BLK_ERASE_COUNT. */
+#define ACMD41  (ACMD_MASK | CMD_MASK | 41)     /**< SDC application command 41: SEND_OP_COND. */
 
 #define IS_ACMD(CMD) ((CMD) & ACMD_MASK)        /**< Check if command is an application command (ACMD). */
 
@@ -805,7 +832,8 @@ static PT_THREAD(sdc_pt_write(uint8_t * rx_data,
  *
  * @param[in] p_event       Pointer to the SPI event structure.
  */
-static void spi_handler(nrf_drv_spi_evt_t const * p_event)
+static void spi_handler(nrf_drv_spi_evt_t const * p_event,
+                        void *                    p_context)
 {
     uint8_t * rx_data = p_event->data.done.p_rx_buffer;
     uint8_t rx_length = p_event->data.done.rx_length;
@@ -1088,8 +1116,7 @@ ret_code_t app_sdc_init(app_sdc_config_t const * const p_config, sdc_event_handl
                             .mode         = NRF_DRV_SPI_MODE_0,
                             .bit_order    = NRF_DRV_SPI_BIT_ORDER_MSB_FIRST,
                         };
-
-    err_code = nrf_drv_spi_init(&m_spi, &spi_cfg, spi_handler);
+    err_code = nrf_drv_spi_init(&m_spi, &spi_cfg, spi_handler, NULL);
     APP_ERROR_CHECK(err_code);
 
     m_cb.handler            = event_handler;

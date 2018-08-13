@@ -123,7 +123,7 @@ extern "C" {
 #define BLE_APPEARANCE_GENERIC_HID                          960 /**< Human Interface Device (HID). */
 #define BLE_APPEARANCE_HID_KEYBOARD                         961 /**< Keyboard (HID Subtype). */
 #define BLE_APPEARANCE_HID_MOUSE                            962 /**< Mouse (HID Subtype). */
-#define BLE_APPEARANCE_HID_JOYSTICK                         963 /**< Joystiq (HID Subtype). */
+#define BLE_APPEARANCE_HID_JOYSTICK                         963 /**< Joystick (HID Subtype). */
 #define BLE_APPEARANCE_HID_GAMEPAD                          964 /**< Gamepad (HID Subtype). */
 #define BLE_APPEARANCE_HID_DIGITIZERSUBTYPE                 965 /**< Digitizer Tablet (HID Subtype). */
 #define BLE_APPEARANCE_HID_CARD_READER                      966 /**< Card Reader (HID Subtype). */
@@ -151,7 +151,7 @@ extern "C" {
 #define BLE_APPEARANCE_OUTDOOR_SPORTS_ACT_LOC_AND_NAV_POD  5188 /**< Location and Navigation Pod (Outdoor Sports Activity subtype). */
 /** @} */
 
-/** @brief Set .type and .uuid fields of ble_uuid_struct to specified uuid value. */
+/** @brief Set .type and .uuid fields of ble_uuid_struct to specified UUID value. */
 #define BLE_UUID_BLE_ASSIGN(instance, value) do {\
             instance.type = BLE_UUID_TYPE_BLE; \
             instance.uuid = value;} while(0)

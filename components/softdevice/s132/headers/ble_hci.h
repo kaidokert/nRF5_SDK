@@ -89,7 +89,7 @@ extern "C" {
 0x21 Role Change Not Allowed
 */
 #define BLE_HCI_STATUS_CODE_LMP_RESPONSE_TIMEOUT       0x22       /**< LMP Response Timeout. */
-#define BLE_HCI_STATUS_CODE_LMP_ERROR_TRANSACTION_COLLISION 0x23  /**< LMP Error Transaction Collision/LL Procedure Collision. */
+/*0x23 LMP Error Transaction Collision*/
 #define BLE_HCI_STATUS_CODE_LMP_PDU_NOT_ALLOWED        0x24       /**< LMP PDU Not Allowed. */
 /*0x25 Encryption Mode Not Acceptable
 0x26 Link Key Can Not be Changed
@@ -116,7 +116,7 @@ extern "C" {
 0x39 Connection Rejected due to No Suitable Channel Found*/
 #define BLE_HCI_CONTROLLER_BUSY                        0x3A       /**< Controller Busy. */
 #define BLE_HCI_CONN_INTERVAL_UNACCEPTABLE             0x3B       /**< Connection Interval Unacceptable. */
-#define BLE_HCI_DIRECTED_ADVERTISER_TIMEOUT            0x3C       /**< Directed Adverisement Timeout. */
+#define BLE_HCI_DIRECTED_ADVERTISER_TIMEOUT            0x3C       /**< Directed Advertisement Timeout. */
 #define BLE_HCI_CONN_TERMINATED_DUE_TO_MIC_FAILURE     0x3D       /**< Connection Terminated due to MIC Failure. */
 #define BLE_HCI_CONN_FAILED_TO_BE_ESTABLISHED          0x3E       /**< Connection Failed to be Established. */
 
